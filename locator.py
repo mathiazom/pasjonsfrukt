@@ -3,6 +3,7 @@ import os
 import time
 
 from selenium import webdriver
+from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 
 import requests
@@ -14,7 +15,9 @@ def scrape_episode_ids():
 
 
 def locate(episodes):
-    with webdriver.Firefox() as driver:
+    firefox_options = Options()
+    firefox_options.add_argument("-headless")
+    with webdriver.Firefox(options=firefox_options) as driver:
         driver.get("https://podme.com/no/")
         WebDriverWait(driver, timeout=20).until(
             lambda d: d.find_element_by_class_name("login-button"),
