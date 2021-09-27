@@ -10,7 +10,7 @@ from rfeed import Item, Guid, Enclosure, Feed, Image
 import harvester
 import locator
 
-YIELD_DIRECTORY = os.environ['YIELD_DIRECTORY']
+YIELD_DIRECTORY = os.environ['PASJONSFRUKT_YIELD_DIRECTORY']
 
 EPISODES_API_URL = "https://api.podme.com/web/api/v2/episode/slug/papaya"
 

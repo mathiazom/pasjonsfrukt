@@ -26,11 +26,11 @@ def locate(episodes):
         WebDriverWait(driver, timeout=20).until(
             lambda d: d.find_element_by_id("logonIdentifier"),
             "Failed to find email input"
-        ).send_keys(os.environ["PODME_EMAIL"])
+        ).send_keys(os.environ["PASJONSFRUKT_PODME_EMAIL"])
         WebDriverWait(driver, timeout=20).until(
             lambda d: d.find_element_by_id("password"),
             "Failed to find password input"
-        ).send_keys(os.environ["PODME_PASSWORD"])
+        ).send_keys(os.environ["PASJONSFRUKT_PODME_PASSWORD"])
         WebDriverWait(driver, timeout=20).until(
             lambda d: d.find_element_by_id("next"),
             "Failed to find login submit button"
