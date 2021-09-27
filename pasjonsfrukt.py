@@ -114,7 +114,7 @@ def build_rss(episodes):
         description="Tre fete typer prøver seg i det private næringsliv.",
         language="no",
         image=Image(
-            url='https://podmestorage.blob.core.windows.net/podcast-images/1ed3d6f17ef641b09a133464d128e8cb_medium.jpg',
+            url='https://pasjonsfrukt.biku.be/media/pasjonsfrukt.jpg',
             title='Pasjonsfrukt',
             link='https://pasjonsfrukt.biku.be/rss'
         ),
