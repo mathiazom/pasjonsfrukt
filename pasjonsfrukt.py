@@ -10,10 +10,6 @@ from rfeed import Item, Guid, Enclosure, Feed, Image
 import harvester
 import locator
 
-from dotenv import load_dotenv
-
-load_dotenv()
-
 YIELD_DIRECTORY = os.environ['YIELD_DIRECTORY']
 
 EPISODES_API_URL = "https://api.podme.com/web/api/v2/episode/slug/papaya"
