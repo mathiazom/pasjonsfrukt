@@ -12,10 +12,15 @@ import locator
 
 YIELD_DIRECTORY = os.environ['PASJONSFRUKT_YIELD_DIRECTORY']
 
-EPISODES_API_URL = "https://api.podme.com/web/api/v2/episode/slug/papaya"
-
 if not os.path.isdir(YIELD_DIRECTORY):
     os.mkdir(YIELD_DIRECTORY)
+
+INVENTORY_DIRECTORY = os.environ['PASJONSFRUKT_INVENTORY_DIRECTORY']
+
+if not os.path.isdir(INVENTORY_DIRECTORY):
+    os.mkdir(INVENTORY_DIRECTORY)
+
+EPISODES_API_URL = "https://api.podme.com/web/api/v2/episode/slug/papaya"
 
 RSS_PATH = f"{YIELD_DIRECTORY}/feed.xml"
 
@@ -34,7 +39,7 @@ def path_for_episode(e):
 
 
 def harvest():
-    inventory_path = f"inventory.txt"
+    inventory_path = f"{INVENTORY_DIRECTORY}/inventory.txt"
     # create inventory file if it does not exist
     if not os.path.isfile(inventory_path):
         open(inventory_path, "x").close()
