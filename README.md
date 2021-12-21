@@ -10,8 +10,10 @@ pip install -r requirements
 3. Add PodMe credentials as environment variables
 (you can use `.env.dist` as a template for your own `.env`)
 ```sh
+...
 PASJONSFRUKT_PODME_EMAIL=your@podme.email
 PASJONSFRUKT_PODME_PASSWORD=yourpodmepassword
+...
 ```
 
 ### Usage

@@ -3,26 +3,18 @@ import re
 import sys
 from datetime import datetime
 
-import requests
 from starlette.responses import Response
 from rfeed import Item, Guid, Enclosure, Feed, Image
+import podme_api
+from podme_api.exceptions import AccessDeniedError
 
-import harvester
-import locator
+PODCAST_SLUG = "papaya"
 
 YIELD_DIRECTORY = os.environ['PASJONSFRUKT_YIELD_DIRECTORY']
 
-if not os.path.isdir(YIELD_DIRECTORY):
-    os.mkdir(YIELD_DIRECTORY)
+RSS_DIRECTORY = YIELD_DIRECTORY
 
-INVENTORY_DIRECTORY = os.environ['PASJONSFRUKT_INVENTORY_DIRECTORY']
-
-if not os.path.isdir(INVENTORY_DIRECTORY):
-    os.mkdir(INVENTORY_DIRECTORY)
-
-EPISODES_API_URL = "https://api.podme.com/web/api/v2/episode/slug/papaya"
-
-RSS_PATH = f"{YIELD_DIRECTORY}/feed.xml"
+RSS_FEED_NAME = "feed.xml"
 
 
 class RSSResponse(Response):
@@ -38,74 +30,82 @@ def path_for_episode(e):
     return f'{YIELD_DIRECTORY}/{e["id"]}.mp3'
 
 
-def harvest():
-    inventory_path = f"{INVENTORY_DIRECTORY}/inventory.txt"
-    # create inventory file if it does not exist
-    if not os.path.isfile(inventory_path):
-        open(inventory_path, "x").close()
-    # retrieve already harvested episodes
-    with open(inventory_path, "r") as inventory:
-        harvested = [line.strip() for line in inventory.readlines()]
-    to_harvest = list(set(locator.scrape_episode_ids()) - set(harvested))
+def harvest(client, slug):
+    harvested_ids = harvested_episode_ids(client, slug)
+    published_ids = client.get_episode_ids(slug)
+    to_harvest = [e for e in published_ids if e not in harvested_ids]
     if len(to_harvest) == 0:
         print("[INFO] Nothing new, all available episodes already harvested")
         return
     print(f"[INFO] Found {len(to_harvest)} new episode{'s' if len(to_harvest) > 1 else ''} ready to harvest")
+    # create yield directory if it does not exist
+    if not os.path.isdir(YIELD_DIRECTORY):
+        os.mkdir(YIELD_DIRECTORY)
     # harvest each missing episode
-    with open(inventory_path, "a+") as inventory:
-        for episode_id, date, remote_path in locator.locate(to_harvest):
-            success = harvester.harvest(f"{YIELD_DIRECTORY}/{episode_id}.mp3", remote_path)
-            if success:
-                inventory.write(episode_id + "\n")
-    sync_rss()
+    for episode_id in to_harvest:
+        client.download_episode(
+            f"{YIELD_DIRECTORY}/{episode_id}.mp3",
+            client.get_episode_info(episode_id)['streamUrl']
+        )
+    sync_rss(client, slug)
 
 
-def harvested_episodes():
-    episode_data = requests.get(EPISODES_API_URL).json()
-    episodes_by_date = {str(e['id']): e for e in episode_data}
+def harvested_episode_ids(client, slug):
+    if not os.path.isdir(YIELD_DIRECTORY):
+        return []
+    episode_ids = client.get_episode_ids(slug)
     harvested = []
     for filename in os.listdir(YIELD_DIRECTORY):
         m = re.match(r'(.*)\.mp3', filename)
         if m is not None:
-            episode_id = m.group(1)
-            if episode_id in episodes_by_date:
-                harvested.append(episodes_by_date[episode_id])
+            episode_id = int(m.group(1))
+            if episode_id in episode_ids:
+                harvested.append(episode_id)
     return harvested
 
 
-def sync_rss():
+def harvested_episodes(client, slug):
+    return [client.get_episode_info(e) for e in harvested_episode_ids(client, slug)]
+
+
+def sync_rss(client, slug):
     print(f"[INFO] Updating RSS feed...")
-    episodes = harvested_episodes()
+    episodes = harvested_episodes(client, slug)
     rss = build_rss(episodes)
-    with open(RSS_PATH, "w") as rss_file:
+    # create RSS directory if it does not exist
+    if not os.path.isdir(RSS_DIRECTORY):
+        os.mkdir(RSS_DIRECTORY)
+    with open(f"{RSS_DIRECTORY}/{RSS_FEED_NAME}", "w") as rss_file:
         rss_file.write(rss)
-    print(f"[INFO] RSS now serving {len(episodes)} episode{'s' if len(episodes) > 1 else ''}")
+    print(f"[INFO] RSS now serving {len(episodes)} episode{'s' if len(episodes) != 1 else ''}")
+
+
+def date_of_episode(episode):
+    date_iso_str = re.sub(r'\.\d*', "", episode['dateAdded'])
+    try:
+        return datetime.fromisoformat(date_iso_str)
+    except ValueError:
+        print("[ERROR] Invalid ISO date string")
+        try:
+            # Try again with just the date part
+            return datetime.fromisoformat(episode['dateAdded'][:10])
+        except ValueError:
+            return datetime.now()
 
 
 def build_rss(episodes):
     items = []
     for e in episodes:
-        date_iso_str = re.sub(r'\.\d*', "", e['dateAdded'])
-        try:
-            date = datetime.fromisoformat(date_iso_str)
-        except ValueError:
-            print("[ERROR] Invalid ISO date string")
-            try:
-                # Try again with just the date part
-                date = datetime.fromisoformat(e['dateAdded'][:10])
-            except ValueError:
-                date = datetime.now()
-        guid = e['id']
         items.append(Item(
             title=e['title'],
             description=e['description'],
-            guid=Guid(guid, isPermaLink=False),
+            guid=Guid(e['id'], isPermaLink=False),
             enclosure=Enclosure(
                 url=full_path_for_episode(e),
                 type='audio/mpeg',
                 length=os.stat(path_for_episode(e)).st_size
             ),
-            pubDate=date
+            pubDate=date_of_episode(e)
         ))
 
     feed = Feed(
@@ -118,18 +118,34 @@ def build_rss(episodes):
             title='Pasjonsfrukt',
             link='https://pasjonsfrukt.biku.be/rss'
         ),
-        items=items
+        items=sorted(items, key=lambda i: i.pubDate, reverse=True)
     )
 
     return feed.rss()
 
 
-if len(sys.argv) > 1:
-    if sys.argv[1] == "harvest":
-        harvest()
-    elif sys.argv[1] == "rss":
-        sync_rss()
+def main():
+    if len(sys.argv) > 1:
+        op = sys.argv[1]
+        if op in ["harvest", "rss"]:
+            podme_client = podme_api.PodMeClient(
+                email=os.environ["PASJONSFRUKT_PODME_EMAIL"],
+                password=os.environ["PASJONSFRUKT_PODME_PASSWORD"]
+            )
+            try:
+                podme_client.login()
+            except AccessDeniedError:
+                print("[FAIL] Access denied when retrieving PodMe token, please check your login credentials")
+                return
+            if op == "harvest":
+                harvest(podme_client, PODCAST_SLUG)
+            elif op == "rss":
+                sync_rss(podme_client, PODCAST_SLUG)
+        else:
+            print("[FAIL] Argument must be either 'harvest' or 'rss'")
     else:
-        print("[FAIL] Argument must be either 'harvest' or 'rss'")
-else:
-    print("[FAIL] Missing operation argument. Use 'harvest' to grab new episodes, or 'rss' to update RSS feed")
+        print("[FAIL] Missing operation argument. Use 'harvest' to grab new episodes, or 'rss' to update RSS feed")
+
+
+if __name__ == '__main__':
+    main()
