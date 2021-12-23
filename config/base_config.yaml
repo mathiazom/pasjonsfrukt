@@ -1,0 +1,9 @@
+---
+# DON'T EDIT THIS FILE
+# these are sensible values used as fallback
+# you can override them in 'config.yaml'
+
+yield_dir: "yield"
+defaults:
+  feed_name: "feed"
+...

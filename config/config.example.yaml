@@ -1,0 +1,14 @@
+---
+host: "https://<your-domain-here>"
+yield_dir: "f"
+auth:
+  email: "<your-email-here>"
+  password: "<your-password-here>"
+podcasts:
+  papaya:
+    feed_name: "papayayaya"
+  gi-meg-alle-detaljene:
+  konspirasjonspodden:
+defaults:
+  feed_name: "feed"
+...
