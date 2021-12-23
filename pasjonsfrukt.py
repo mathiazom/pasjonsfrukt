@@ -83,10 +83,10 @@ def sync_feed(client, slug):
     if slug not in conf.podcasts:
         print(f"[FAIL] The slug '{slug}' did not match any podcasts in the config file")
         return
-    print(f"[INFO] Updating '{slug}' feed...")
+    print(f"[INFO] Syncing '{slug}' feed...")
     episodes = harvested_episodes(client, slug)
     podcast_info = client.get_podcast_info(slug)
-    rss = build_rss(
+    feed = build_feed(
         episodes,
         slug,
         podcast_info['title'],
@@ -94,12 +94,12 @@ def sync_feed(client, slug):
         podcast_info['imageUrl']
     )
     os.makedirs(conf.get_podcast_dir(slug), exist_ok=True)
-    with open(conf.get_podcast_feed_path(slug), "w") as rss_file:
-        rss_file.write(rss)
+    with open(conf.get_podcast_feed_path(slug), "w") as feed_file:
+        feed_file.write(feed)
     print(f"[INFO] '{slug}' feed now serving {len(episodes)} episode{'s' if len(episodes) != 1 else ''}")
 
 
-def build_rss(episodes, slug, title, description, image_url):
+def build_feed(episodes, slug, title, description, image_url):
     items = []
     for e in episodes:
         episode_path = f"{conf.get_podcast_dir(slug)}/{e['id']}.mp3"
@@ -135,7 +135,7 @@ def main():
         if conf is None:
             raise InvalidConfigError(f"No config defined")
         op = sys.argv[1]
-        if op in ["harvest", "rss"]:
+        if op in ["harvest", "sync_feed"]:
             podme_client = podme_api.PodMeClient(
                 email=conf.auth.email,
                 password=conf.auth.password
@@ -149,17 +149,18 @@ def main():
                 slug = sys.argv[2]
                 if op == "harvest":
                     harvest(podme_client, slug)
-                elif op == "rss":
+                elif op == "sync_feed":
                     sync_feed(podme_client, slug)
             else:
                 if op == "harvest":
                     harvest_all(podme_client)
-                elif op == "rss":
+                elif op == "sync_feed":
                     sync_all_feeds(podme_client)
         else:
-            print("[FAIL] Argument must be either 'harvest' or 'rss'")
+            print("[FAIL] Argument must be either 'harvest' or 'sync_feed'")
     else:
-        print("[FAIL] Missing operation argument. Use 'harvest' to grab new episodes, or 'rss' to update RSS feed")
+        print(
+            "[FAIL] Missing operation argument. Use 'harvest' to grab new episodes, or 'sync_feed' to update RSS feed")
 
 
 if __name__ == '__main__':
