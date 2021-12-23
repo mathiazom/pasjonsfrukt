@@ -7,14 +7,9 @@ pip install -r requirements
 ```
 2. Install [`ffmpeg`](https://ffmpeg.org/) (required by `youtube-dl` for the `m3u8` format).
 
-3. Add PodMe credentials as environment variables
-(you can use `.env.dist` as a template for your own `.env`)
-```sh
-...
-PASJONSFRUKT_PODME_EMAIL=your@podme.email
-PASJONSFRUKT_PODME_PASSWORD=yourpodmepassword
-...
-```
+3. Define harvest configurations by copying `config/config.dist.yaml` to your own `config/config.yaml`.  
+Most importantly, you need to provide a `host` path (for links in RSS feed), login credentials for you PodMe account, and a list of the podcasts you wish to harvest.  
+See `config/config.example.yaml` for a sample configuration.
 
 ### Usage
 
@@ -25,12 +20,12 @@ python pasjonsfrukt.py harvest
 
 Update RSS feed
 ```sh
-python pasjonsfrukt.py rss
+python pasjonsfrukt.py sync_feed
 ```
-> The RSS feed is always updated after harvest, so this should in theory never be required...
+> The feed is always updated after harvest, so manual feed syncing is usually not required
 
-Run webserver to serve RSS feed on `/f/feed.xml`
+Run webserver to serve RSS feed on `/<yield_dir>/<feed_name>.xml`
 ```sh
 uvicorn app:app
 ```
-> The feed and media files path can be changed via the `YIELD_DIRECTORY` env variable to produce paths on the form `/YIELD_DIRECTORY/feed.xml` and `/YIELD_DIRECTORY/561509.mp3`
+> `yield_dir` and `feed_name` can be defined in the config file.
