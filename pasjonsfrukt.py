@@ -93,7 +93,9 @@ def sync_feed(client, slug):
     os.makedirs(APP_ROOT / conf.get_podcast_dir(slug), exist_ok=True)
     with open(APP_ROOT / conf.get_podcast_feed_path(slug), "w") as feed_file:
         feed_file.write(feed)
-    print(f"[INFO] '{slug}' feed now serving {len(episodes)} episode{'s' if len(episodes) != 1 else ''}")
+    print(
+        f"[INFO] '{slug}' feed now serving {len(episodes)} episode{'s' if len(episodes) != 1 else ''}"
+        f" at {conf.host}/{conf.get_podcast_feed_path(slug)}")
 
 
 def build_feed(episodes, slug, title, description, image_url):
