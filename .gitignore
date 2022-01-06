@@ -1,3 +1,5 @@
-.env
-f/
+.idea/
+venv/
+
 config/config.yaml
+yield/
