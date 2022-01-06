@@ -1,8 +1,7 @@
-import os
-from pathlib import Path
+from typing import Optional
 
-from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
 
 from config import Config
 from definitions import APP_ROOT
@@ -14,11 +13,34 @@ conf = Config.from_config_file(
     base_path=APP_ROOT / "config" / "base_config.yaml"
 )
 
-# Use absolute path to avoid dependency on working directory
-absolute_yield_dir = APP_ROOT / conf.yield_dir
 
-# Make sure yield directory exists
-os.makedirs(absolute_yield_dir, exist_ok=True)
+def verify_secret(secret):
+    if "secret" in conf and conf.secret is not None and secret != conf.secret:
+        if secret is None:
+            raise HTTPException(status_code=401, detail="Authorization failed, missing secret")
+        raise HTTPException(status_code=401, detail="Authorization failed, incorrect secret")
 
-# Mount yield directory as static files to yield path
-app.mount(f"/{conf.yield_dir}", StaticFiles(directory=absolute_yield_dir), name="static")
+
+def verify_podcast_slug(slug):
+    if slug not in conf.podcasts:
+        raise HTTPException(status_code=404, detail="Requested resource not found")
+
+
+def file_response_if_exists(file_path):
+    if not file_path.exists() or not file_path.is_file():
+        raise HTTPException(status_code=404, detail="Requested resource not found")
+    return FileResponse(str(file_path.resolve()))
+
+
+@app.get(f"/{conf.yield_dir}/{{slug}}")
+async def get_feed(slug: str, secret: Optional[str] = None):
+    verify_secret(secret)
+    verify_podcast_slug(slug)
+    return file_response_if_exists(APP_ROOT / conf.get_podcast_feed_path(slug))
+
+
+@app.get(f"/{conf.yield_dir}/{{podcast_slug}}/{{episode_id}}")
+async def get_episode(podcast_slug: str, episode_id: int, secret: Optional[str] = None):
+    verify_secret(secret)
+    verify_podcast_slug(podcast_slug)
+    return file_response_if_exists(APP_ROOT / conf.yield_dir / podcast_slug / f"{episode_id}.mp3")

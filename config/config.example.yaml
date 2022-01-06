@@ -1,6 +1,7 @@
 ---
 host: "https://<your-domain-here>"
 yield_dir: "f"
+secret: "<optional-access-secret>"
 auth:
   email: "<your-email-here>"
   password: "<your-password-here>"

@@ -95,25 +95,32 @@ def sync_feed(client, slug):
         feed_file.write(feed)
     print(
         f"[INFO] '{slug}' feed now serving {len(episodes)} episode{'s' if len(episodes) != 1 else ''}"
-        f" at {conf.host}/{conf.get_podcast_feed_path(slug)}")
+        f" at {conf.host}/{conf.get_podcast_dir(slug)}")
+
+
+def get_secret_query_parameter():
+    if "secret" not in conf or conf.secret is None:
+        return ""  # no secret required, so don't append query parameter
+    return f"?secret={conf.secret}"
 
 
 def build_feed(episodes, slug, title, description, image_url):
     items = []
+    secret_query_param = get_secret_query_parameter()
     for e in episodes:
-        episode_path = f"{conf.get_podcast_dir(slug)}/{e['id']}.mp3"
+        episode_path = f"{conf.get_podcast_dir(slug)}/{e['id']}"
         items.append(Item(
             title=e['title'],
             description=e['description'],
             guid=Guid(e['id'], isPermaLink=False),
             enclosure=Enclosure(
-                url=f'{conf.host}/{episode_path}',
+                url=f'{conf.host}/{episode_path}/{secret_query_param}',
                 type='audio/mpeg',
-                length=(APP_ROOT / episode_path).stat().st_size
+                length=(APP_ROOT / f"{episode_path}.mp3").stat().st_size
             ),
             pubDate=date_of_episode(e)
         ))
-    feed_link = f"{conf.host}/{conf.get_podcast_feed_path(slug)}"
+    feed_link = f"{conf.host}/{conf.get_podcast_dir(slug)}/{secret_query_param}"
     feed = Feed(
         title=title,
         link=feed_link,
