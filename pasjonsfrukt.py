@@ -7,15 +7,10 @@ from rfeed import Item, Guid, Enclosure, Feed, Image
 import podme_api
 from podme_api.exceptions import AccessDeniedError
 
-from config import Config
+from definitions import APP_ROOT
 from exceptions import InvalidConfigError
 from utils import date_of_episode
-
-BASE_CONFIG_PATH = "config/base_config.yaml"
-
-CONFIG_PATH = "config/config.yaml"
-
-conf = Config.from_config_file(CONFIG_PATH, BASE_CONFIG_PATH)
+from app import conf
 
 
 class RSSResponse(Response):
@@ -43,12 +38,12 @@ def harvest(client, slug):
         return
     print(
         f"[INFO] Found {len(to_harvest)} new episode{'s' if len(to_harvest) > 1 else ''} of '{slug}' ready to harvest")
-    podcast_dir = conf.get_podcast_dir(slug)
+    podcast_dir = APP_ROOT / conf.get_podcast_dir(slug)
     os.makedirs(podcast_dir, exist_ok=True)
     # harvest each missing episode
     for episode_id in to_harvest:
         client.download_episode(
-            f"{podcast_dir}/{episode_id}.mp3",
+            str(podcast_dir / f"{episode_id}.mp3"),  # path must be of type str
             client.get_episode_info(episode_id)['streamUrl']
         )
     sync_feed(client, slug)
@@ -59,14 +54,16 @@ def harvested_episodes(client, slug):
 
 
 def harvested_episode_ids(client, slug):
-    podcast_dir = conf.get_podcast_dir(slug)
-    if not os.path.isdir(podcast_dir):
+    podcast_dir = APP_ROOT / conf.get_podcast_dir(slug)
+    if not podcast_dir.is_dir():
         # no directory, so clearly no harvested episodes
         return []
     episode_ids = client.get_episode_ids(slug)
     harvested = []
-    for filename in os.listdir(podcast_dir):
-        m = re.match(r'(.*)\.mp3$', filename)
+    for f in podcast_dir.iterdir():
+        if not f.is_file():
+            continue
+        m = re.match(r'(.*)\.mp3$', f.name)
         if m is not None:
             episode_id = int(m.group(1))
             if episode_id in episode_ids:
@@ -93,8 +90,8 @@ def sync_feed(client, slug):
         podcast_info['description'],
         podcast_info['imageUrl']
     )
-    os.makedirs(conf.get_podcast_dir(slug), exist_ok=True)
-    with open(conf.get_podcast_feed_path(slug), "w") as feed_file:
+    os.makedirs(APP_ROOT / conf.get_podcast_dir(slug), exist_ok=True)
+    with open(APP_ROOT / conf.get_podcast_feed_path(slug), "w") as feed_file:
         feed_file.write(feed)
     print(f"[INFO] '{slug}' feed now serving {len(episodes)} episode{'s' if len(episodes) != 1 else ''}")
 
@@ -110,7 +107,7 @@ def build_feed(episodes, slug, title, description, image_url):
             enclosure=Enclosure(
                 url=f'{conf.host}/{episode_path}',
                 type='audio/mpeg',
-                length=os.stat(episode_path).st_size
+                length=(APP_ROOT / episode_path).stat().st_size
             ),
             pubDate=date_of_episode(e)
         ))

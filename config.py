@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import yaml
 from munch import Munch
 
@@ -56,10 +58,10 @@ class Config(Munch):
                 self[key] = overrides[key]
 
     def get_podcast_dir(self, slug):
-        return f"{self.yield_dir}/{slug}"
+        return Path(self.yield_dir) / slug
 
     def get_podcast_feed_path(self, slug):
-        return f"{self.get_podcast_dir(slug)}/{self.podcasts.get(slug).feed_name}.xml"
+        return self.get_podcast_dir(slug) / f"{self.podcasts.get(slug).feed_name}.xml"
 
     def validate(self):
         for non_optional in ['host', 'podcasts']:
