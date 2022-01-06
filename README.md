@@ -18,13 +18,13 @@ Harvest episodes
 python pasjonsfrukt.py harvest
 ```
 
-Update RSS feed
+Update RSS feeds
 ```sh
-python pasjonsfrukt.py sync_feed
+python pasjonsfrukt.py sync
 ```
-> The feed is always updated after harvest, so manual feed syncing is usually not required
+> The feeds are always updated after harvest, so manual feed syncing is usually not required
 
-Run webserver to serve RSS feed on `/<yield_dir>/<feed_name>.xml`
+Run webserver to serve RSS feeds on `/<yield_dir>/<podcast_slug>/<feed_name>.xml`
 ```sh
 uvicorn app:app
 ```

@@ -132,7 +132,7 @@ def main():
         if conf is None:
             raise InvalidConfigError(f"No config defined")
         op = sys.argv[1]
-        if op in ["harvest", "sync_feed"]:
+        if op in ["harvest", "sync"]:
             podme_client = podme_api.PodMeClient(
                 email=conf.auth.email,
                 password=conf.auth.password
@@ -146,18 +146,18 @@ def main():
                 slug = sys.argv[2]
                 if op == "harvest":
                     harvest(podme_client, slug)
-                elif op == "sync_feed":
+                elif op == "sync":
                     sync_feed(podme_client, slug)
             else:
                 if op == "harvest":
                     harvest_all(podme_client)
-                elif op == "sync_feed":
+                elif op == "sync":
                     sync_all_feeds(podme_client)
         else:
-            print("[FAIL] Argument must be either 'harvest' or 'sync_feed'")
+            print("[FAIL] Argument must be either 'harvest' or 'sync'")
     else:
         print(
-            "[FAIL] Missing operation argument. Use 'harvest' to grab new episodes, or 'sync_feed' to update RSS feed")
+            "[FAIL] Missing operation argument. Use 'harvest' to grab new episodes, or 'sync' to update RSS feeds")
 
 
 if __name__ == '__main__':
