@@ -3,7 +3,7 @@ import re
 import sys
 
 from starlette.responses import Response
-from rfeed import Item, Guid, Enclosure, Feed, Image
+from rfeed import Item, Guid, Enclosure, Feed, Image, iTunesItem, iTunes
 import podme_api
 from podme_api.exceptions import AccessDeniedError
 
@@ -118,7 +118,12 @@ def build_feed(episodes, slug, title, description, image_url):
                 type='audio/mpeg',
                 length=(APP_ROOT / f"{episode_path}.mp3").stat().st_size
             ),
-            pubDate=date_of_episode(e)
+            pubDate=date_of_episode(e),
+            extensions=[
+                iTunesItem(
+                    duration=e['length']
+                )
+            ]
         ))
     feed_link = f"{conf.host}/{conf.get_podcast_dir(slug)}/{secret_query_param}"
     feed = Feed(
@@ -131,7 +136,8 @@ def build_feed(episodes, slug, title, description, image_url):
             title=title,
             link=feed_link
         ),
-        items=sorted(items, key=lambda i: i.pubDate, reverse=True)
+        items=sorted(items, key=lambda i: i.pubDate, reverse=True),
+        extensions=[iTunes()]
     )
     return feed.rss()
 
