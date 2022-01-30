@@ -34,7 +34,7 @@ def harvest(client, slug):
     harvested_ids = harvested_episode_ids(client, slug)
     to_harvest = [e for e in published_ids if e not in harvested_ids]
     if len(to_harvest) == 0:
-        print(f"[INFO] Nothing new from '{slug}', all available episodes of already harvested")
+        print(f"[INFO] Nothing new from '{slug}', all available episodes already harvested")
         return
     print(
         f"[INFO] Found {len(to_harvest)} new episode{'s' if len(to_harvest) > 1 else ''} of '{slug}' ready to harvest")
