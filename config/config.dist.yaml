@@ -1,8 +1,0 @@
----
-host: ""
-auth:
-  email: ""
-  password: ""
-podcasts:
-  # Add podcasts here
-...

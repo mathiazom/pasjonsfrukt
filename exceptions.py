@@ -1,2 +1,0 @@
-class InvalidConfigError(Exception):
-    pass

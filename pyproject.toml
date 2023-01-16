@@ -1,0 +1,35 @@
+[tool.poetry]
+name = "pasjonsfrukt"
+version = "0.1.0"
+description = "Scrape PodMe podcast streams to mp3 and host with RSS feed"
+authors = ["Mathias Oterhals Myklebust <mathias@oterbust.no>"]
+readme = "README.md"
+homepage = "https://github.com/mathiazom/pasjonsfrukt"
+repository = "https://github.com/mathiazom/pasjonsfrukt"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3.10",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[tool.poetry.urls]
+"Bug Tracker" = "https://github.com/mathiazom/pasjonsfrukt/issues"
+
+[tool.poetry.scripts]
+pasjonsfrukt = "pasjonsfrukt.cli:cli"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.88.0"
+rfeed = "^1.1.1"
+podme-api = "^0.1.3"
+uvicorn = "^0.20.0"
+typer = "^0.7.0"
+dataclass-wizard = {extras = ["yaml"], version = "^0.22.2"}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
