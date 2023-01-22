@@ -12,7 +12,7 @@ from .utils import date_of_episode
 
 
 def get_podme_client(email: str, password: str):
-    client = podme_api.PodMeClient(
+    client = podme_api.PodMeSchibstedClient(
         email=email,
         password=password
     )
