@@ -1,3 +1,5 @@
+import logging
+
 import typer
 import uvicorn
 import pprint
@@ -5,6 +7,7 @@ import pprint
 from . import api
 from .api import api as api_app, api_config
 from .config import config_from_stream
+from .logging_utils import LogRedactSecretFilter
 from .main import get_podme_client, sync_slug_feed, harvest_podcast
 
 cli = typer.Typer()
@@ -77,6 +80,8 @@ def serve_api(
     ctx.args.insert(0, f"{api.__name__}:api")
     config = config_from_stream(config_stream)
     api_app.dependency_overrides[api_config] = lambda: config
+    if config.secret is not None:
+        logging.getLogger("uvicorn.access").addFilter(LogRedactSecretFilter([config.secret]))
     uvicorn.main.main(args=ctx.args)
 
 
