@@ -1,9 +1,5 @@
 # 🍹 pasjonsfrukt
 
-[![PyPI](https://img.shields.io/pypi/v/pasjonsfrukt)](https://pypi.org/project/pasjonsfrukt/)
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pasjonsfrukt)
-[![PyPI - License](https://img.shields.io/pypi/l/pasjonsfrukt)](https://github.com/mathiazom/pasjonsfrukt/blob/main/LICENSE)
-
 Scrape PodMe podcast streams to mp3 and host with RSS feed.
 
 <i style="color:grey">Note: A valid PodMe subscription is required to access premium content</i>
@@ -13,8 +9,9 @@ Scrape PodMe podcast streams to mp3 and host with RSS feed.
 1. Install `pasjonsfrukt`
 
 ```
-pip install pasjonsfrukt
+pip install git+https://github.com/mathiazom/pasjonsfrukt.git@schibsted-auth
 ```
+> this version is not available at PyPi yet becuase of an experimental version of the `podme_api` dependency
 
 2. Install [`ffmpeg`](https://ffmpeg.org/) (required by dependency `youtube-dl` for the `m3u8` format).
 
