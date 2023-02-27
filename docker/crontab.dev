@@ -1,0 +1,3 @@
+# */30 8-21 * * * cd /app || exit 1; PATH=$PATH:/usr/local/bin pasjonsfrukt harvest >> /var/log/pasjonsfrukt.log 2>&1
+* * * * * cd /app || exit 1; PATH=$PATH:/usr/local/bin pasjonsfrukt harvest >> /var/log/pasjonsfrukt.log 2>&1
+# Empty line to please the cron gods ...

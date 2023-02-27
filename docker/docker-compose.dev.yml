@@ -1,0 +1,17 @@
+services:
+  pasjonsfrukt:
+    build:
+      context: ..
+      dockerfile: ./docker/Dockerfile
+    container_name: pasjonsfrukt-dev
+    restart: unless-stopped
+    #command: --host 0.0.0.0 --port 8000  # customize flags for 'api' startup command
+    ports:
+      - "8000:8000"
+    volumes:
+      # yield directory
+      - ./yield:/app/yield
+      # config
+      - ../config.yaml:/app/config.yaml:ro
+      # crontab
+      - ./crontab.dev:/etc/cron.d/pasjonsfrukt-crontab:ro
