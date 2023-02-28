@@ -124,7 +124,7 @@ def build_feed(config: Config, episodes: list[podme_api.types.PodMeEpisode], slu
             link=feed_link
         ),
         items=sorted(items, key=lambda i: i.pubDate, reverse=True),
-        extensions=[iTunes()]
+        extensions=[iTunes(block='Yes')]
     )
     return feed.rss()
 
