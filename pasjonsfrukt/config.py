@@ -13,7 +13,8 @@ class Auth:
 
 @dataclass
 class Podcast:
-    feed_name: Optional[str] = "feed"
+    feed_name: str = "feed"
+    most_recent_episodes_limit: Optional[int] = None
 
 
 @dataclass

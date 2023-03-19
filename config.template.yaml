@@ -8,6 +8,7 @@ auth:
 podcasts:
 #  papaya:
 #    feed_name: "papayayaya"
+#    most_recent_episodes_limit: 50
 #  gi-meg-alle-detaljene:
 #  konspirasjonspodden:
 ...

@@ -31,13 +31,23 @@ def harvest_podcast(client: podme_api.PodMeClient, config: Config, slug: str):
     if len(published_ids) == 0:
         print(f"[WARN] Could not find any published episodes for '{slug}'")
         return
+    most_recent_episodes_limit = config.podcasts[slug].most_recent_episodes_limit
+    if most_recent_episodes_limit is None:
+        relevant_harvest_ids = published_ids
+    elif most_recent_episodes_limit <= 0:
+        relevant_harvest_ids = []
+    else:
+        relevant_harvest_ids = published_ids[-most_recent_episodes_limit:]
     harvested_ids = harvested_episode_ids(client, config, slug)
-    to_harvest = [e for e in published_ids if e not in harvested_ids]
+    to_harvest = [e for e in relevant_harvest_ids if e not in harvested_ids]
     if len(to_harvest) == 0:
-        print(f"[INFO] Nothing new from '{slug}', all available episodes already harvested")
+        print(f"[INFO] Nothing new from '{slug}', all available episodes already harvested"
+              f"{f' (only looking at {most_recent_episodes_limit} most recent)' if most_recent_episodes_limit is not None else ''}")
         return
     print(
-        f"[INFO] Found {len(to_harvest)} new episode{'s' if len(to_harvest) > 1 else ''} of '{slug}' ready to harvest")
+        f"[INFO] Found {len(to_harvest)} new episode{'s' if len(to_harvest) > 1 else ''} of '{slug}' ready to harvest"
+        f"{f' (only looking at {most_recent_episodes_limit} most recent)' if most_recent_episodes_limit is not None else ''}"
+    )
     podcast_dir = build_podcast_dir(config, slug)
     os.makedirs(podcast_dir, exist_ok=True)
     # harvest each missing episode
