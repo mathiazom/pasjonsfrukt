@@ -5,6 +5,8 @@ yield_dir: "yield"
 auth:
   email: "<your-email-here>"
   password: "<your-password-here>"
+# Un-comment the following line if you use Schibsted SSO to log in to your PodMe account.
+#  schibsted: true
 podcasts:
 #  papaya:
 #    feed_name: "papayayaya"

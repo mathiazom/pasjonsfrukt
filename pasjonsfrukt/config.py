@@ -9,6 +9,7 @@ from dataclass_wizard import YAMLWizard
 class Auth:
     email: str
     password: str
+    schibsted: bool = False
 
 
 @dataclass

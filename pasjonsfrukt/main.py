@@ -1,21 +1,26 @@
 import os
 import re
-from pathlib import Path
 
-from rfeed import Item, Guid, Enclosure, Feed, Image, iTunesItem, iTunes
-import podme_api
-import podme_api.types
+from pathlib import Path
+from podme_api import PodMeClient, PodMeSchibstedClient
 from podme_api.exceptions import AccessDeniedError
+from podme_api.models import PodMeEpisode, PodMePodcast
+from rfeed import Item, Guid, Enclosure, Feed, Image, iTunesItem, iTunes, iTunesOwner, iTunesCategory
 
 from .config import Config
-from .utils import date_of_episode
 
 
-def get_podme_client(email: str, password: str):
-    client = podme_api.PodMeClient(
-        email=email,
-        password=password
-    )
+def get_podme_client(email: str, password: str, schibsted_client=False):
+    if schibsted_client:
+        client = PodMeSchibstedClient(
+            email=email,
+            password=password,
+        )
+    else:
+        client = PodMeClient(
+            email=email,
+            password=password,
+        )
     try:
         client.login()
         return client
@@ -23,7 +28,7 @@ def get_podme_client(email: str, password: str):
         print("[FAIL] Access denied when retrieving PodMe token, please check your login credentials")
 
 
-def harvest_podcast(client: podme_api.PodMeClient, config: Config, slug: str):
+def harvest_podcast(client: PodMeClient, config: Config, slug: str):
     if slug not in config.podcasts:
         print(f"[FAIL] The slug '{slug}' did not match any podcasts in the config file")
         return
@@ -59,7 +64,7 @@ def harvest_podcast(client: podme_api.PodMeClient, config: Config, slug: str):
     sync_slug_feed(client, config, slug)
 
 
-def harvested_episode_ids(client: podme_api.PodMeClient, config: Config, slug: str):
+def harvested_episode_ids(client: PodMeClient, config: Config, slug: str):
     podcast_dir = build_podcast_dir(config, slug)
     if not podcast_dir.is_dir():
         # no directory, so clearly no harvested episodes
@@ -99,47 +104,66 @@ def build_podcast_episode_file_path(config: Config, podcast_slug: str, episode_i
     return build_podcast_dir(config, podcast_slug) / f"{episode_id}.mp3"
 
 
-def build_feed(config: Config, episodes: list[podme_api.types.PodMeEpisode], slug: str, title: str, description: str,
-               image_url: str):
+def build_feed(
+        config: Config,
+        episodes: list[PodMeEpisode],
+        slug: str,
+        podcast: PodMePodcast,
+):
     secret_query_param = get_secret_query_parameter(config)
     items = []
     for e in episodes:
-        episode_id = e['id']
+        episode_id = e.id
         episode_path = f"{slug}/{episode_id}"
         items.append(Item(
-            title=e['title'],
-            description=e['description'],
+            title=e.title,
+            description=e.description,
             guid=Guid(episode_id, isPermaLink=False),
             enclosure=Enclosure(
                 url=f'{config.host}/{episode_path}/{secret_query_param}',
                 type='audio/mpeg',
                 length=build_podcast_episode_file_path(config, slug, episode_id).stat().st_size
             ),
-            pubDate=date_of_episode(e),
+            pubDate=e.dateAdded,
             extensions=[
                 iTunesItem(
-                    duration=e['length']
+                    author=e.authorFullName,
+                    duration=e.length,
                 )
             ]
         ))
     feed_link = f"{config.host}/{slug}/{secret_query_param}"
     feed = Feed(
-        title=title,
+        title=podcast.title,
         link=feed_link,
-        description=description,
+        description=podcast.description,
         language="no",
         image=Image(
-            url=image_url,
-            title=title,
-            link=feed_link
+            url=podcast.imageUrl,
+            title=podcast.title,
+            link=feed_link,
         ),
+        categories=[c.key for c in podcast.categories],
+        copyright="PodMe",
         items=sorted(items, key=lambda i: i.pubDate, reverse=True),
-        extensions=[iTunes(block='Yes')]
+        extensions=[iTunes(
+            block='Yes',
+            author=podcast.authorFullName,
+            subtitle=(podcast.description[:255] + '..') if len(podcast.description) > 255 else podcast.description,
+            summary=podcast.description,
+            image=podcast.imageUrl,
+            explicit="clean",
+            owner=iTunesOwner(
+                name=podcast.authorFullName,
+                email='hej@podme.com',
+            ),
+            categories=[iTunesCategory(c.key) for c in podcast.categories],
+        )]
     )
     return feed.rss()
 
 
-def sync_slug_feed(client: podme_api.PodMeClient, config: Config, slug: str):
+def sync_slug_feed(client: PodMeClient, config: Config, slug: str):
     if slug not in config.podcasts:
         print(f"[FAIL] The slug '{slug}' did not match any podcasts in the config file")
         return
@@ -150,9 +174,7 @@ def sync_slug_feed(client: podme_api.PodMeClient, config: Config, slug: str):
         config,
         episodes,
         slug,
-        podcast_info['title'],
-        podcast_info['description'],
-        podcast_info['imageUrl']
+        podcast_info,
     )
     os.makedirs(build_podcast_dir(config, slug), exist_ok=True)
     with open(build_podcast_feed_path(config, slug), mode="w", encoding="utf-8") as feed_file:
