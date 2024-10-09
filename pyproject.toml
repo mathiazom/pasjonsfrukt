@@ -21,13 +21,14 @@ classifiers = [
 pasjonsfrukt = "pasjonsfrukt.cli:cli"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.11"
 fastapi = "^0.88.0"
 rfeed = "^1.1.1"
-podme-api = { git = "https://github.com/mathiazom/podme_api.git", rev = "c2234a24d5e2ee5f14a1910294fc3fc3c423c3ec" }
+podme-api = { git = "https://github.com/mathiazom/podme_api.git", rev = "ed6afb9e19af8c3cec0b1f3a33c46a27a4526430" }
 uvicorn = "^0.20.0"
 typer = "^0.7.0"
 dataclass-wizard = {extras = ["yaml"], version = "^0.22.2"}
+asyncer = "^0.0.8"
 
 
 [build-system]

@@ -6,15 +6,16 @@ import pprint
 
 from . import api
 from .api import api as api_app, api_config
+from .async_cli import AsyncTyper
 from .config import config_from_stream
 from .logging_utils import LogRedactSecretFilter
 from .main import get_podme_client, sync_slug_feed, harvest_podcast
 
-cli = typer.Typer()
+cli = AsyncTyper()
 
 
 @cli.command()
-def harvest(
+async def harvest(
         podcast_slugs: list[str] = typer.Argument(
             None,  # NB: default is actually an empty list | TODO: #108 at tiangolo/typer
             metavar="[PODCAST_SLUG]..."
@@ -33,11 +34,11 @@ def harvest(
     client = get_podme_client(config.auth.email, config.auth.password)
     to_harvest = config.podcasts.keys() if len(podcast_slugs) == 0 else podcast_slugs
     for s in to_harvest:
-        harvest_podcast(client, config, s)
+        await harvest_podcast(client, config, s)
 
 
 @cli.command("sync")
-def sync_feeds(
+async def sync_feeds(
         podcast_slugs: list[str] = typer.Argument(
             None,  # NB: default is actually an empty list | TODO: #108 at tiangolo/typer
             metavar="[PODCAST_SLUG]..."
@@ -56,7 +57,7 @@ def sync_feeds(
     client = get_podme_client(config.auth.email, config.auth.password)
     to_sync = config.podcasts.keys() if len(podcast_slugs) == 0 else podcast_slugs
     for s in to_sync:
-        sync_slug_feed(client, config, s)
+        await sync_slug_feed(client, config, s)
 
 
 @cli.command(
