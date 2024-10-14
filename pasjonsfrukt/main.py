@@ -1,4 +1,3 @@
-import os
 import re
 from pathlib import Path
 
@@ -31,13 +30,13 @@ async def harvest_podcast(client: PodMeClient, config: Config, slug: str):
         return
     most_recent_episodes_limit = config.podcasts[slug].most_recent_episodes_limit
     if most_recent_episodes_limit is None:
-        relevant_harvest_ids = published_ids
-    elif most_recent_episodes_limit <= 0:
-        relevant_harvest_ids = []
+        episodes = await client.get_episode_list(slug)
     else:
-        relevant_harvest_ids = published_ids[-most_recent_episodes_limit:]
+        episodes = await client.get_latest_episodes(slug, most_recent_episodes_limit)
+
+    published_ids = [e.id for e in episodes]
     harvested_ids = await harvested_episode_ids(client, config, slug)
-    to_harvest = [e for e in relevant_harvest_ids if e not in harvested_ids]
+    to_harvest = [e for e in published_ids if e not in harvested_ids]
     if len(to_harvest) == 0:
         print(
             f"[INFO] Nothing new from '{slug}', all available episodes already harvested"
@@ -49,13 +48,15 @@ async def harvest_podcast(client: PodMeClient, config: Config, slug: str):
         f"{f' (only looking at {most_recent_episodes_limit} most recent)' if most_recent_episodes_limit is not None else ''}"
     )
     podcast_dir = build_podcast_dir(config, slug)
-    os.makedirs(podcast_dir, exist_ok=True)
+    podcast_dir.mkdir(parents=True, exist_ok=True)
+
     # harvest each missing episode
-    for episode_id in to_harvest:
-        await client.download_episode(
-            podcast_dir / f"{episode_id}.mp3",
-            (await client.get_episode_info(episode_id)).stream_url,
-        )
+    download_urls = await client.get_episode_download_url_bulk(to_harvest)
+    download_infos = [
+        (url, podcast_dir / f"{episode_id}.mp3") for episode_id, url in download_urls
+    ]
+    await client.download_files(download_infos)
+
     await sync_slug_feed(client, config, slug)
 
 
@@ -153,10 +154,8 @@ async def sync_slug_feed(client: PodMeClient, config: Config, slug: str):
         print(f"[FAIL] The slug '{slug}' did not match any podcasts in the config file")
         return
     print(f"[INFO] Syncing '{slug}' feed...")
-    episodes = [
-        await client.get_episode_info(e)
-        for e in (await harvested_episode_ids(client, config, slug))
-    ]
+    episode_ids = await harvested_episode_ids(client, config, slug)
+    episodes = await client.get_episodes_info(episode_ids)
     podcast_info = await client.get_podcast_info(slug)
     feed = build_feed(
         config,
@@ -166,10 +165,8 @@ async def sync_slug_feed(client: PodMeClient, config: Config, slug: str):
         podcast_info.description,
         podcast_info.image_url,
     )
-    os.makedirs(build_podcast_dir(config, slug), exist_ok=True)
-    with open(
-        build_podcast_feed_path(config, slug), mode="w", encoding="utf-8"
-    ) as feed_file:
+    build_podcast_dir(config, slug).mkdir(parents=True, exist_ok=True)
+    with build_podcast_feed_path(config, slug).open("w", encoding="utf-8") as feed_file:
         feed_file.write(feed)
     print(
         f"[INFO] '{slug}' feed now serving {len(episodes)} episode{'s' if len(episodes) != 1 else ''}"
