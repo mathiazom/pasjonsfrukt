@@ -168,17 +168,6 @@ test = ["anyio[trio]", "coverage[toml] (>=7)", "exceptiongroup (>=1.2.0)", "hypo
 trio = ["trio (>=0.26.1)"]
 
 [[package]]
-name = "async-timeout"
-version = "4.0.3"
-description = "Timeout context manager for asyncio programs"
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "async-timeout-4.0.3.tar.gz", hash = "sha256:4640d96be84d82d02ed59ea2b7105a0f7b33abe8703703cd0ab0bf87c427522f"},
-    {file = "async_timeout-4.0.3-py3-none-any.whl", hash = "sha256:7405140ff1230c310e51dc27b3145b9092d659ce68ff733fb0cefe3ee42be028"},
-]
-
-[[package]]
 name = "asyncer"
 version = "0.0.8"
 description = "Asyncer, async and await, focused on developer experience."
@@ -386,6 +375,17 @@ files = [
 
 [package.extras]
 all = ["flake8 (>=7.1.1)", "mypy (>=1.11.2)", "pytest (>=8.3.2)", "ruff (>=0.6.2)"]
+
+[[package]]
+name = "isodate"
+version = "0.7.2"
+description = "An ISO 8601 date/time/duration parser and formatter"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "isodate-0.7.2-py3-none-any.whl", hash = "sha256:28009937d8031054830160fce6d409ed342816b543597cece116d966c6d99e15"},
+    {file = "isodate-0.7.2.tar.gz", hash = "sha256:4cd1aa0f43ca76f4a6c6c0292a85f40b35ec2e43e315b59f06e6d32171a953e6"},
+]
 
 [[package]]
 name = "markdown-it-py"
@@ -638,32 +638,25 @@ type = ["mypy (>=1.11.2)"]
 
 [[package]]
 name = "podme-api"
-version = "0.0.0"
+version = "1.2.9"
 description = "A client library for using the podme.com web API"
 optional = false
-python-versions = "^3.11"
-files = []
-develop = false
+python-versions = "<4.0,>=3.11"
+files = [
+    {file = "podme_api-1.2.9-py3-none-any.whl", hash = "sha256:b73adb099059aa5208875c8977bfe925229b8e786fadc9bb37fca5a0ccc9c160"},
+    {file = "podme_api-1.2.9.tar.gz", hash = "sha256:3e1974d0478b59eb23e3abe0bafe9a67e529304f7752a921d7e6ac523b1e0297"},
+]
 
 [package.dependencies]
-aiofiles = "^24.1.0"
-aiohttp = "^3.10.9"
-async-timeout = "^4.0.3"
-mashumaro = "^3.13.1"
-orjson = "^3.10.7"
-pathlib = "^1.0.1"
-platformdirs = "^4.3.6"
-rich = "^13.9.2"
-youtube-dl = "^2021.12.17"
-
-[package.extras]
-docs = []
-
-[package.source]
-type = "git"
-url = "https://github.com/mathiazom/podme_api.git"
-reference = "ed6afb9e19af8c3cec0b1f3a33c46a27a4526430"
-resolved_reference = "ed6afb9e19af8c3cec0b1f3a33c46a27a4526430"
+aiofiles = ">=24.1.0,<25.0.0"
+aiohttp = ">=3.10.9,<4.0.0"
+isodate = ">=0.7.2,<0.8.0"
+mashumaro = ">=3.13.1,<4.0.0"
+orjson = ">=3.10.7,<4.0.0"
+pathlib = ">=1.0.1,<2.0.0"
+platformdirs = ">=4.3.6,<5.0.0"
+python-ffmpeg = ">=2.0.12,<3.0.0"
+rich = ">=13.9.2,<14.0.0"
 
 [[package]]
 name = "propcache"
@@ -832,6 +825,23 @@ dotenv = ["python-dotenv (>=0.10.4)"]
 email = ["email-validator (>=1.0.3)"]
 
 [[package]]
+name = "pyee"
+version = "12.0.0"
+description = "A rough port of Node.js's EventEmitter to Python with a few tricks of its own"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "pyee-12.0.0-py3-none-any.whl", hash = "sha256:7b14b74320600049ccc7d0e0b1becd3b4bd0a03c745758225e31a59f4095c990"},
+    {file = "pyee-12.0.0.tar.gz", hash = "sha256:c480603f4aa2927d4766eb41fa82793fe60a82cbfdb8d688e0d08c55a534e145"},
+]
+
+[package.dependencies]
+typing-extensions = "*"
+
+[package.extras]
+dev = ["black", "build", "flake8", "flake8-black", "isort", "jupyter-console", "mkdocs", "mkdocs-include-markdown-plugin", "mkdocstrings[python]", "pytest", "pytest-asyncio", "pytest-trio", "sphinx", "toml", "tox", "trio", "trio", "trio-typing", "twine", "twisted", "validate-pyproject[all]"]
+
+[[package]]
 name = "pygments"
 version = "2.18.0"
 description = "Pygments is a syntax highlighting package written in Python."
@@ -844,6 +854,21 @@ files = [
 
 [package.extras]
 windows-terminal = ["colorama (>=0.4.6)"]
+
+[[package]]
+name = "python-ffmpeg"
+version = "2.0.12"
+description = "A python binding for FFmpeg which provides sync and async APIs"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "python_ffmpeg-2.0.12-py3-none-any.whl", hash = "sha256:d86697da8dfb39335183e336d31baf42fb217468adf5ac97fd743898240faae3"},
+    {file = "python_ffmpeg-2.0.12.tar.gz", hash = "sha256:19ac80af5a064a2f53c245af1a909b2d7648ea045500d96d3bcd507b88d43dc7"},
+]
+
+[package.dependencies]
+pyee = "*"
+typing-extensions = "*"
 
 [[package]]
 name = "pyyaml"
@@ -1118,18 +1143,7 @@ idna = ">=2.0"
 multidict = ">=4.0"
 propcache = ">=0.2.0"
 
-[[package]]
-name = "youtube-dl"
-version = "2021.12.17"
-description = "YouTube video downloader"
-optional = false
-python-versions = "*"
-files = [
-    {file = "youtube_dl-2021.12.17-py2.py3-none-any.whl", hash = "sha256:f1336d5de68647e0364a47b3c0712578e59ec76f02048ff5c50ef1c69d79cd55"},
-    {file = "youtube_dl-2021.12.17.tar.gz", hash = "sha256:bc59e86c5d15d887ac590454511f08ce2c47698d5a82c27bfe27b5d814bbaed2"},
-]
-
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "0ddbe33cd9e7ad3c1c344e1eae19f66b57343eaef6e01b7e4cf7f494f65935c7"
+content-hash = "0e5ec37e0b18770d5196a3f4552d26b08df280718fbcbaf158e6e75d9ac771b0"
