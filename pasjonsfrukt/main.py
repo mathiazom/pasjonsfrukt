@@ -24,15 +24,15 @@ async def harvest_podcast(client: PodMeClient, config: Config, slug: str):
     if slug not in config.podcasts:
         print(f"[FAIL] The slug '{slug}' did not match any podcasts in the config file")
         return
-    published_ids = await client.get_episode_ids(slug)
-    if len(published_ids) == 0:
-        print(f"[WARN] Could not find any published episodes for '{slug}'")
-        return
     most_recent_episodes_limit = config.podcasts[slug].most_recent_episodes_limit
     if most_recent_episodes_limit is None:
         episodes = await client.get_episode_list(slug)
     else:
         episodes = await client.get_latest_episodes(slug, most_recent_episodes_limit)
+
+    if len(episodes) == 0:
+        print(f"[WARN] Could not find any published episodes for '{slug}'")
+        return
 
     published_ids = [e.id for e in episodes]
     harvested_ids = await harvested_episode_ids(client, config, slug)
