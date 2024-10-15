@@ -1,3 +1,4 @@
+import contextlib
 import re
 from pathlib import Path
 
@@ -12,12 +13,19 @@ from rfeed import Item, Guid, Enclosure, Feed, Image, iTunesItem, iTunes
 from .config import Config
 
 
-def get_podme_client(email: str, password: str):
-    return PodMeClient(
+@contextlib.asynccontextmanager
+async def get_podme_client(email: str, password: str):
+    client = PodMeClient(
         auth_client=PodMeDefaultAuthClient(
             user_credentials=PodMeUserCredentials(email=email, password=password)
-        )
+        ),
+        request_timeout=30,
     )
+    try:
+        await client.__aenter__()
+        yield client
+    finally:
+        await client.__aexit__(None, None, None)
 
 
 async def harvest_podcast(client: PodMeClient, config: Config, slug: str):
@@ -55,7 +63,16 @@ async def harvest_podcast(client: PodMeClient, config: Config, slug: str):
     download_infos = [
         (url, podcast_dir / f"{episode_id}.mp3") for episode_id, url in download_urls
     ]
-    await client.download_files(download_infos)
+
+    def log_progress(url: str, progress: int, total: int):
+        print(f"[INFO] Downloading from {url}: {progress}/{total}.")
+
+    def log_finished(url: str, path: str):
+        print(f"[INFO] Finished downloading {url} to {path}.")
+
+    await client.download_files(
+        download_infos, on_progress=log_progress, on_finished=log_finished
+    )
 
     await sync_slug_feed(client, config, slug)
 
