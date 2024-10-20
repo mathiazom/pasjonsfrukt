@@ -1,5 +1,6 @@
 import contextlib
 import re
+import logging
 from pathlib import Path
 
 from podme_api import (
@@ -7,14 +8,28 @@ from podme_api import (
     PodMeUserCredentials,
     PodMeClient,
     PodMeEpisode,
+    PodMePodcast,
 )
-from rfeed import Item, Guid, Enclosure, Feed, Image, iTunesItem, iTunes
+from rfeed import (
+    Item,
+    Guid,
+    Enclosure,
+    Feed,
+    Image,
+    iTunesItem,
+    iTunes,
+    iTunesCategory,
+    iTunesOwner,
+)
+from jinja2 import Template
 
 from .config import Config
 
+_LOGGER = logging.getLogger(__package__)
+
 
 @contextlib.asynccontextmanager
-async def get_podme_client(email: str, password: str):
+async def get_podme_client(email: str, password: str) -> PodMeClient:
     client = PodMeClient(
         auth_client=PodMeDefaultAuthClient(
             user_credentials=PodMeUserCredentials(email=email, password=password)
@@ -30,7 +45,9 @@ async def get_podme_client(email: str, password: str):
 
 async def harvest_podcast(client: PodMeClient, config: Config, slug: str):
     if slug not in config.podcasts:
-        print(f"[FAIL] The slug '{slug}' did not match any podcasts in the config file")
+        _LOGGER.error(
+            f"The slug '{slug}' did not match any podcasts in the config file"
+        )
         return
     most_recent_episodes_limit = config.podcasts[slug].most_recent_episodes_limit
     if most_recent_episodes_limit is None:
@@ -39,21 +56,25 @@ async def harvest_podcast(client: PodMeClient, config: Config, slug: str):
         episodes = await client.get_latest_episodes(slug, most_recent_episodes_limit)
 
     if len(episodes) == 0:
-        print(f"[WARN] Could not find any published episodes for '{slug}'")
+        _LOGGER.warning(f"Could not find any published episodes for '{slug}'")
         return
 
     published_ids = [e.id for e in episodes]
     harvested_ids = await harvested_episode_ids(client, config, slug)
     to_harvest = [e for e in published_ids if e not in harvested_ids]
     if len(to_harvest) == 0:
-        print(
-            f"[INFO] Nothing new from '{slug}', all available episodes already harvested"
-            f"{f' (only looking at {most_recent_episodes_limit} most recent)' if most_recent_episodes_limit is not None else ''}"
+        _LOGGER.info(
+            f"Nothing new from '{slug}', all available episodes already harvested"
+            f" (only looking at {most_recent_episodes_limit} most recent)"
+            if most_recent_episodes_limit is not None
+            else ""
         )
         return
-    print(
-        f"[INFO] Found {len(to_harvest)} new episode{'s' if len(to_harvest) > 1 else ''} of '{slug}' ready to harvest"
-        f"{f' (only looking at {most_recent_episodes_limit} most recent)' if most_recent_episodes_limit is not None else ''}"
+    _LOGGER.info(
+        f"Found {len(to_harvest)} new episode{'s' if len(to_harvest) > 1 else ''} of '{slug}' ready to harvest"
+        f" (only looking at {most_recent_episodes_limit} most recent)"
+        if most_recent_episodes_limit is not None
+        else ""
     )
     podcast_dir = build_podcast_dir(config, slug)
     podcast_dir.mkdir(parents=True, exist_ok=True)
@@ -61,14 +82,16 @@ async def harvest_podcast(client: PodMeClient, config: Config, slug: str):
     # harvest each missing episode
     download_urls = await client.get_episode_download_url_bulk(to_harvest)
     download_infos = [
-        (url, podcast_dir / f"{episode_id}.mp3") for episode_id, url in download_urls
+        (url, build_podcast_episode_file_path(config, slug, episode_id))
+        for episode_id, url in download_urls
     ]
 
     def log_progress(url: str, progress: int, total: int):
-        print(f"[INFO] Downloading from {url}: {progress}/{total}.")
+        percentage = int(100 * progress / total)
+        _LOGGER.debug(f"Downloading from {url}: {percentage}%")
 
     def log_finished(url: str, path: str):
-        print(f"[INFO] Finished downloading {url} to {path}.")
+        _LOGGER.info(f"Finished downloading {url} to {path}.")
 
     await client.download_files(
         download_infos, on_progress=log_progress, on_finished=log_finished
@@ -98,7 +121,7 @@ async def harvested_episode_ids(client: PodMeClient, config: Config, slug: str):
 def get_secret_query_parameter(config: Config):
     if config.secret is None:
         return ""  # no secret required, so don't append query parameter
-    return f"?secret={config.secret}"
+    return f"secret={config.secret}"
 
 
 def sanitize_xml(content: str) -> str:
@@ -123,9 +146,7 @@ def build_feed(
     config: Config,
     episodes: list[PodMeEpisode],
     slug: str,
-    title: str,
-    description: str,
-    image_url: str,
+    podcast: PodMePodcast,
 ):
     secret_query_param = get_secret_query_parameter(config)
     items = []
@@ -138,7 +159,9 @@ def build_feed(
                 description=e.description,
                 guid=Guid(episode_id, isPermaLink=False),
                 enclosure=Enclosure(
-                    url=f"{config.host}/{episode_path}/{secret_query_param}",
+                    url=str(
+                        config.build_url(episode_path).with_query(secret_query_param)
+                    ),
                     type="audio/mpeg",
                     length=build_podcast_episode_file_path(config, slug, episode_id)
                     .stat()
@@ -153,24 +176,62 @@ def build_feed(
                 ],
             )
         )
-    feed_link = f"{config.host}/{slug}/{secret_query_param}"
+    feed_link = str(config.build_url(slug).with_query(secret_query_param))
     feed = Feed(
-        title=title,
+        title=podcast.title,
         link=feed_link,
-        description=description,
+        description=podcast.description,
         language="no",
-        image=Image(url=image_url, title=title, link=feed_link),
+        image=Image(url=podcast.image_url, title=podcast.title, link=feed_link),
+        categories=[c.name for c in podcast.categories],
+        copyright="PodMe",
         items=sorted(items, key=lambda i: i.pubDate, reverse=True),
-        extensions=[iTunes(block="Yes")],
+        extensions=[
+            iTunes(
+                block=True,
+                author=podcast.author_full_name,
+                subtitle=(podcast.description[:255] + "..")
+                if len(podcast.description) > 255
+                else podcast.description,
+                summary=podcast.description,
+                image=podcast.image_url,
+                explicit=False,
+                owner=iTunesOwner(
+                    name=podcast.author_full_name,
+                    email="hej@podme.com",
+                ),
+                categories=[iTunesCategory(c.name) for c in podcast.categories],
+            )
+        ],
     )
     return feed.rss()
 
 
+async def sync_index(config: Config, podcasts: list[PodMePodcast]):
+    _LOGGER.info("Syncing index...")
+    templates_dir = Path(config.templates_dir)
+    yield_dir = Path(config.yield_dir)
+
+    index_tpl = templates_dir / "index.html.j2"
+    with index_tpl.open("r", encoding="utf-8") as f:
+        template = Template(f.read())
+        html_output = template.render(
+            config=config, url=config.build_url(), podcasts=podcasts
+        )
+
+    with (yield_dir / "index.html").open("w", encoding="utf-8") as f:
+        f.write(html_output)
+
+    _LOGGER.info(f"Index successfully saved to {yield_dir / 'index.html'}")
+
+
 async def sync_slug_feed(client: PodMeClient, config: Config, slug: str):
     if slug not in config.podcasts:
-        print(f"[FAIL] The slug '{slug}' did not match any podcasts in the config file")
+        _LOGGER.error(
+            f"The slug '{slug}' did not match any podcasts in the config file"
+        )
         return
-    print(f"[INFO] Syncing '{slug}' feed...")
+    _LOGGER.info(f"Syncing '{slug}' feed...")
     episode_ids = await harvested_episode_ids(client, config, slug)
     episodes = await client.get_episodes_info(episode_ids)
     podcast_info = await client.get_podcast_info(slug)
@@ -178,13 +239,11 @@ async def sync_slug_feed(client: PodMeClient, config: Config, slug: str):
         config,
         episodes,
         slug,
-        podcast_info.title,
-        podcast_info.description,
-        podcast_info.image_url,
+        podcast_info,
     )
     build_podcast_dir(config, slug).mkdir(parents=True, exist_ok=True)
     with build_podcast_feed_path(config, slug).open("w", encoding="utf-8") as feed_file:
         feed_file.write(feed)
-    print(
-        f"[INFO] '{slug}' feed now serving {len(episodes)} episode{'s' if len(episodes) != 1 else ''}"
+    _LOGGER.info(
+        f"'{slug}' feed now serving {len(episodes)} episode{'s' if len(episodes) != 1 else ''}"
     )

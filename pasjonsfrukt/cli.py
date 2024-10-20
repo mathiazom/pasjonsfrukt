@@ -8,8 +8,8 @@ from . import api
 from .api import api as api_app, api_config
 from .async_cli import AsyncTyper
 from .config import config_from_stream
-from .logging_utils import LogRedactSecretFilter
-from .main import get_podme_client, sync_slug_feed, harvest_podcast
+from .logging_utils import LogRedactSecretFilter, get_logging_level
+from .main import get_podme_client, sync_slug_feed, harvest_podcast, sync_index
 
 cli = AsyncTyper()
 
@@ -39,6 +39,9 @@ async def harvest(
         for s in to_harvest:
             await harvest_podcast(client, config, s)
 
+        podcasts = await client.get_podcasts_info(to_harvest)
+        await sync_index(config, podcasts)
+
 
 @cli.command("sync")
 async def sync_feeds(
@@ -62,6 +65,9 @@ async def sync_feeds(
         to_sync = config.podcasts.keys() if len(podcast_slugs) == 0 else podcast_slugs
         for s in to_sync:
             await sync_slug_feed(client, config, s)
+
+        podcasts = await client.get_podcasts_info(to_sync)
+        await sync_index(config, podcasts)
 
 
 @cli.command(
@@ -113,7 +119,26 @@ def print_config(
 
 
 @cli.callback()
-def callback():
+def callback(
+    verbose: int = typer.Option(
+        0,
+        "--verbose",
+        "-v",
+        help="Enable verbose output. Repeat for increased verbosity.",
+        show_default=False,
+        metavar="",
+        count=True,
+    ),
+    debug: bool = typer.Option(
+        False,
+        "--debug",
+        "-d",
+        help="Enable debugging.",
+        show_default=False,
+        is_flag=True,
+    ),
+):
     """
     Scrape PodMe podcast streams to mp3 and host with RSS feed
     """
+    logging.basicConfig(level=get_logging_level(verbose, debug))
