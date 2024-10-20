@@ -24,7 +24,7 @@ pasjonsfrukt = "pasjonsfrukt.cli:cli"
 python = "^3.11"
 fastapi = "^0.88.0"
 rfeed = "^1.1.1"
-podme-api = "^1.2.6"
+podme-api = "^1.2.8"
 uvicorn = "^0.20.0"
 typer = "^0.7.0"
 dataclass-wizard = {extras = ["yaml"], version = "^0.22.2"}

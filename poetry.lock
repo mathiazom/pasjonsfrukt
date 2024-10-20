@@ -725,13 +725,13 @@ type = ["mypy (>=1.11.2)"]
 
 [[package]]
 name = "podme-api"
-version = "1.2.6"
+version = "1.2.8"
 description = "A client library for using the podme.com web API"
 optional = false
 python-versions = "<4.0,>=3.11"
 files = [
-    {file = "podme_api-1.2.6-py3-none-any.whl", hash = "sha256:f5df96e8c0f385be4591fdadd771fc190bef351c2f2d87d6d853c6faff00c7f9"},
-    {file = "podme_api-1.2.6.tar.gz", hash = "sha256:a22fbefea8b0d0bd807dd2226f4e89e980c3697717b0c6d894c17059ae8a64ca"},
+    {file = "podme_api-1.2.8-py3-none-any.whl", hash = "sha256:810dbb7d54eeeec26a271f12629735ef0f857ee4798bdc75a2238351c9b678a4"},
+    {file = "podme_api-1.2.8.tar.gz", hash = "sha256:940257c93651c790e3f13ae14e71a2cdae0c3126c7493a00a2d163c7645b538b"},
 ]
 
 [package.dependencies]
@@ -742,6 +742,7 @@ mashumaro = ">=3.13.1,<4.0.0"
 orjson = ">=3.10.7,<4.0.0"
 pathlib = ">=1.0.1,<2.0.0"
 platformdirs = ">=4.3.6,<5.0.0"
+python-ffmpeg = ">=2.0.12,<3.0.0"
 rich = ">=13.9.2,<14.0.0"
 
 [[package]]
@@ -911,6 +912,23 @@ dotenv = ["python-dotenv (>=0.10.4)"]
 email = ["email-validator (>=1.0.3)"]
 
 [[package]]
+name = "pyee"
+version = "12.0.0"
+description = "A rough port of Node.js's EventEmitter to Python with a few tricks of its own"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "pyee-12.0.0-py3-none-any.whl", hash = "sha256:7b14b74320600049ccc7d0e0b1becd3b4bd0a03c745758225e31a59f4095c990"},
+    {file = "pyee-12.0.0.tar.gz", hash = "sha256:c480603f4aa2927d4766eb41fa82793fe60a82cbfdb8d688e0d08c55a534e145"},
+]
+
+[package.dependencies]
+typing-extensions = "*"
+
+[package.extras]
+dev = ["black", "build", "flake8", "flake8-black", "isort", "jupyter-console", "mkdocs", "mkdocs-include-markdown-plugin", "mkdocstrings[python]", "pytest", "pytest-asyncio", "pytest-trio", "sphinx", "toml", "tox", "trio", "trio", "trio-typing", "twine", "twisted", "validate-pyproject[all]"]
+
+[[package]]
 name = "pygments"
 version = "2.18.0"
 description = "Pygments is a syntax highlighting package written in Python."
@@ -923,6 +941,21 @@ files = [
 
 [package.extras]
 windows-terminal = ["colorama (>=0.4.6)"]
+
+[[package]]
+name = "python-ffmpeg"
+version = "2.0.12"
+description = "A python binding for FFmpeg which provides sync and async APIs"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "python_ffmpeg-2.0.12-py3-none-any.whl", hash = "sha256:d86697da8dfb39335183e336d31baf42fb217468adf5ac97fd743898240faae3"},
+    {file = "python_ffmpeg-2.0.12.tar.gz", hash = "sha256:19ac80af5a064a2f53c245af1a909b2d7648ea045500d96d3bcd507b88d43dc7"},
+]
+
+[package.dependencies]
+pyee = "*"
+typing-extensions = "*"
 
 [[package]]
 name = "pyyaml"
@@ -1206,4 +1239,4 @@ propcache = ">=0.2.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "ec426fefb75af0202b5a6e88e096d4a0f121a3affa56a7d68e84908e87a99155"
+content-hash = "325fdb7773fc837c151db31c2961a5d768f89f76fb1a18d4bfe2ae8e009de836"
