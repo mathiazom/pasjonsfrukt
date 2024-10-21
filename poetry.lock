@@ -725,13 +725,13 @@ type = ["mypy (>=1.11.2)"]
 
 [[package]]
 name = "podme-api"
-version = "1.2.8"
+version = "1.2.9"
 description = "A client library for using the podme.com web API"
 optional = false
 python-versions = "<4.0,>=3.11"
 files = [
-    {file = "podme_api-1.2.8-py3-none-any.whl", hash = "sha256:810dbb7d54eeeec26a271f12629735ef0f857ee4798bdc75a2238351c9b678a4"},
-    {file = "podme_api-1.2.8.tar.gz", hash = "sha256:940257c93651c790e3f13ae14e71a2cdae0c3126c7493a00a2d163c7645b538b"},
+    {file = "podme_api-1.2.9-py3-none-any.whl", hash = "sha256:b73adb099059aa5208875c8977bfe925229b8e786fadc9bb37fca5a0ccc9c160"},
+    {file = "podme_api-1.2.9.tar.gz", hash = "sha256:3e1974d0478b59eb23e3abe0bafe9a67e529304f7752a921d7e6ac523b1e0297"},
 ]
 
 [package.dependencies]
@@ -1239,4 +1239,4 @@ propcache = ">=0.2.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "325fdb7773fc837c151db31c2961a5d768f89f76fb1a18d4bfe2ae8e009de836"
+content-hash = "2d90996ee9ad02898f3b911886c6a28b1423947c92ce3be0685d798bd4b0b603"
