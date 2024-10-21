@@ -152,7 +152,7 @@ def build_feed(
     items = []
     for e in episodes:
         episode_id = e.id
-        episode_path = f"{slug}/{episode_id}"
+        episode_path = f"{slug}/{episode_id}.mp3"
         items.append(
             Item(
                 title=e.title,
