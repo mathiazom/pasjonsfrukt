@@ -72,3 +72,34 @@ at `<host>/<podcast_slug>/<episode_id>`
 If a `secret` has been defined in the config, a query parameter (`?secret=<secret-string>`) with matching secret string
 is required to access the served podcast feeds and episode files. This is useful for making RSS feeds accessible on the
 web, without making them fully public. Still, the confidentiality is provided as is, with no warranties 🙃
+
+### Serve using nginx
+
+If you prefer hosting the RSS feeds and episode files on your own server, you can use [nginx](https://www.nginx.com/) with the following config.
+
+```nginx
+server {
+    listen 8000;
+    server_name _;
+
+    root /path/to/podcasts;
+
+    location / {
+        # Redirect requests with trailing slash to non-trailing slash
+        rewrite ^/(.*)/$ /$1 permanent;
+        rewrite ^/(.*)/feed.xml /$1 redirect;
+
+        # For requests to the base slug (e.g., /papaya)
+        location ~ ^/[^/]+$ {
+            try_files $uri $uri.xml $uri/$uri.xml =404;
+        }
+
+        location ~ \.mp3$ {
+            sendfile           on;
+            sendfile_max_chunk 1m;
+        }
+
+        try_files $uri =404;
+    }
+}
+```
