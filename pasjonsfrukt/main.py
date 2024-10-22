@@ -108,7 +108,7 @@ def build_feed(config: Config, episodes: list[PodMeEpisode], slug: str, title: s
             description=e.description,
             guid=Guid(episode_id, isPermaLink=False),
             enclosure=Enclosure(
-                url=f'{config.host}/{episode_path}/{secret_query_param}',
+                url=f'{config.host}/{episode_path}{secret_query_param}',
                 type='audio/mpeg',
                 length=build_podcast_episode_file_path(config, slug, episode_id).stat().st_size
             ),
@@ -120,7 +120,7 @@ def build_feed(config: Config, episodes: list[PodMeEpisode], slug: str, title: s
                 )
             ]
         ))
-    feed_link = f"{config.host}/{slug}/{secret_query_param}"
+    feed_link = f"{config.host}/{slug}{secret_query_param}"
     feed = Feed(
         title=title,
         link=feed_link,
