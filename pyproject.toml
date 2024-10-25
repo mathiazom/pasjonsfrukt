@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pasjonsfrukt"
-version = "0.2.1"
+version = "0.2.2"
 description = "Scrape PodMe podcast streams to mp3 and host with RSS feed"
 authors = ["Mathias Oterhals Myklebust <mathias@oterbust.no>"]
 readme = "README.md"
