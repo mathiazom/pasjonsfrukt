@@ -16,5 +16,7 @@ class LogRedactSecretFilter(logging.Filter):
 
     def filter(self, record: logging.LogRecord) -> bool:
         record.msg = self._redacted_string(record.msg)
-        record.args = tuple(self._redacted_string(a) if isinstance(a, str) else a for a in record.args)
+        record.args = tuple(
+            self._redacted_string(a) if isinstance(a, str) else a for a in record.args
+        )
         return True

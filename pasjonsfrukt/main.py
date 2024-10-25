@@ -2,7 +2,12 @@ import contextlib
 import re
 from pathlib import Path
 
-from podme_api import PodMeDefaultAuthClient, PodMeUserCredentials, PodMeClient, PodMeEpisode
+from podme_api import (
+    PodMeDefaultAuthClient,
+    PodMeUserCredentials,
+    PodMeClient,
+    PodMeEpisode,
+)
 from rfeed import Item, Guid, Enclosure, Feed, Image, iTunesItem, iTunes
 
 from .config import Config
@@ -41,8 +46,10 @@ async def harvest_podcast(client: PodMeClient, config: Config, slug: str):
     harvested_ids = await harvested_episode_ids(client, config, slug)
     to_harvest = [e for e in published_ids if e not in harvested_ids]
     if len(to_harvest) == 0:
-        print(f"[INFO] Nothing new from '{slug}', all available episodes already harvested"
-              f"{f' (only looking at {most_recent_episodes_limit} most recent)' if most_recent_episodes_limit is not None else ''}")
+        print(
+            f"[INFO] Nothing new from '{slug}', all available episodes already harvested"
+            f"{f' (only looking at {most_recent_episodes_limit} most recent)' if most_recent_episodes_limit is not None else ''}"
+        )
         return
     print(
         f"[INFO] Found {len(to_harvest)} new episode{'s' if len(to_harvest) > 1 else ''} of '{slug}' ready to harvest"
@@ -80,7 +87,7 @@ async def harvested_episode_ids(client: PodMeClient, config: Config, slug: str):
     for f in podcast_dir.iterdir():
         if not f.is_file():
             continue
-        m = re.match(r'(.*)\.mp3$', f.name)
+        m = re.match(r"(.*)\.mp3$", f.name)
         if m is not None:
             episode_id = int(m.group(1))
             if episode_id in episode_ids:
@@ -93,55 +100,64 @@ def get_secret_query_parameter(config: Config):
         return ""  # no secret required, so don't append query parameter
     return f"?secret={config.secret}"
 
+
 def build_podcast_dir(config: Config, slug: str):
     return Path(config.yield_dir) / slug
 
 
 def build_podcast_feed_path(config: Config, slug: str):
-    return build_podcast_dir(config, slug) / f"{config.podcasts.get(slug).feed_name}.xml"
+    return (
+        build_podcast_dir(config, slug) / f"{config.podcasts.get(slug).feed_name}.xml"
+    )
 
 
 def build_podcast_episode_file_path(config: Config, podcast_slug: str, episode_id: int):
     return build_podcast_dir(config, podcast_slug) / f"{episode_id}.mp3"
 
 
-def build_feed(config: Config, episodes: list[PodMeEpisode], slug: str, title: str, description: str,
-               image_url: str):
+def build_feed(
+    config: Config,
+    episodes: list[PodMeEpisode],
+    slug: str,
+    title: str,
+    description: str,
+    image_url: str,
+):
     secret_query_param = get_secret_query_parameter(config)
     items = []
     for e in episodes:
         episode_id = e.id
         episode_path = f"{slug}/{episode_id}"
-        items.append(Item(
-            title=e.title,
-            description=e.description,
-            guid=Guid(episode_id, isPermaLink=False),
-            enclosure=Enclosure(
-                url=f'{config.host}/{episode_path}{secret_query_param}',
-                type='audio/mpeg',
-                length=build_podcast_episode_file_path(config, slug, episode_id).stat().st_size
-            ),
-            pubDate=e.date_added,
-            extensions=[
-                iTunesItem(
-                    author=e.author_full_name,
-                    duration=e.length,
-                )
-            ]
-        ))
+        items.append(
+            Item(
+                title=e.title,
+                description=e.description,
+                guid=Guid(episode_id, isPermaLink=False),
+                enclosure=Enclosure(
+                    url=f"{config.host}/{episode_path}{secret_query_param}",
+                    type="audio/mpeg",
+                    length=build_podcast_episode_file_path(config, slug, episode_id)
+                    .stat()
+                    .st_size,
+                ),
+                pubDate=e.date_added,
+                extensions=[
+                    iTunesItem(
+                        author=e.author_full_name,
+                        duration=e.length,
+                    )
+                ],
+            )
+        )
     feed_link = f"{config.host}/{slug}{secret_query_param}"
     feed = Feed(
         title=title,
         link=feed_link,
         description=description,
         language="no",
-        image=Image(
-            url=image_url,
-            title=title,
-            link=feed_link
-        ),
+        image=Image(url=image_url, title=title, link=feed_link),
         items=sorted(items, key=lambda i: i.pubDate, reverse=True),
-        extensions=[iTunes(block='Yes')]
+        extensions=[iTunes(block="Yes")],
     )
     return feed.rss()
 
@@ -160,9 +176,11 @@ async def sync_slug_feed(client: PodMeClient, config: Config, slug: str):
         slug,
         podcast_info.title,
         podcast_info.description,
-        podcast_info.image_url
+        podcast_info.image_url,
     )
     build_podcast_dir(config, slug).mkdir(parents=True, exist_ok=True)
     with build_podcast_feed_path(config, slug).open("w", encoding="utf-8") as feed_file:
         feed_file.write(feed)
-    print(f"[INFO] '{slug}' feed now serving {len(episodes)} episode{'s' if len(episodes) != 1 else ''}")
+    print(
+        f"[INFO] '{slug}' feed now serving {len(episodes)} episode{'s' if len(episodes) != 1 else ''}"
+    )

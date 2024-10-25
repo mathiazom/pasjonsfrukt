@@ -16,16 +16,17 @@ cli = AsyncTyper()
 
 @cli.command()
 async def harvest(
-        podcast_slugs: list[str] = typer.Argument(
-            None,  # NB: default is actually an empty list | TODO: #108 at tiangolo/typer
-            metavar="[PODCAST_SLUG]..."
-        ),
-        config_stream: typer.FileText = typer.Option(
-            "config.yaml",
-            "--config-file", "-c",
-            encoding="utf-8",
-            help="Configurations file"
-        )
+    podcast_slugs: list[str] = typer.Argument(
+        None,  # NB: default is actually an empty list | TODO: #108 at tiangolo/typer
+        metavar="[PODCAST_SLUG]...",
+    ),
+    config_stream: typer.FileText = typer.Option(
+        "config.yaml",
+        "--config-file",
+        "-c",
+        encoding="utf-8",
+        help="Configurations file",
+    ),
 ):
     """
     Scrape podcast episodes
@@ -41,16 +42,17 @@ async def harvest(
 
 @cli.command("sync")
 async def sync_feeds(
-        podcast_slugs: list[str] = typer.Argument(
-            None,  # NB: default is actually an empty list | TODO: #108 at tiangolo/typer
-            metavar="[PODCAST_SLUG]..."
-        ),
-        config_stream: typer.FileText = typer.Option(
-            "config.yaml",
-            "--config-file", "-c",
-            encoding="utf-8",
-            help="Configurations file"
-        )
+    podcast_slugs: list[str] = typer.Argument(
+        None,  # NB: default is actually an empty list | TODO: #108 at tiangolo/typer
+        metavar="[PODCAST_SLUG]...",
+    ),
+    config_stream: typer.FileText = typer.Option(
+        "config.yaml",
+        "--config-file",
+        "-c",
+        encoding="utf-8",
+        help="Configurations file",
+    ),
 ):
     """
     Update RSS podcast feeds to match scraped episodes
@@ -64,16 +66,20 @@ async def sync_feeds(
 
 @cli.command(
     name="serve",
-    context_settings={"allow_extra_args": True, "ignore_unknown_options": True}  # Enabled to support uvicorn options
+    context_settings={
+        "allow_extra_args": True,
+        "ignore_unknown_options": True,
+    },  # Enabled to support uvicorn options
 )
 def serve_api(
-        ctx: typer.Context,
-        config_stream: typer.FileText = typer.Option(
-            "config.yaml",
-            "--config-file", "-c",
-            encoding="utf-8",
-            help="Configurations file"
-        )
+    ctx: typer.Context,
+    config_stream: typer.FileText = typer.Option(
+        "config.yaml",
+        "--config-file",
+        "-c",
+        encoding="utf-8",
+        help="Configurations file",
+    ),
 ):
     """
     Serve RSS podcast feeds
@@ -84,20 +90,22 @@ def serve_api(
     config = config_from_stream(config_stream)
     api_app.dependency_overrides[api_config] = lambda: config
     if config.secret is not None:
-        logging.getLogger("uvicorn.access").addFilter(LogRedactSecretFilter([config.secret]))
+        logging.getLogger("uvicorn.access").addFilter(
+            LogRedactSecretFilter([config.secret])
+        )
     uvicorn.main.main(args=ctx.args)
 
 
-@cli.command(
-    name="config"
-)
+@cli.command(name="config")
 def print_config(
-        config_stream: typer.FileText = typer.Option(
-            "config.yaml",
-            "--config-file", "-c",
-            encoding="utf-8",
-            help="Configurations file"
-        )):
+    config_stream: typer.FileText = typer.Option(
+        "config.yaml",
+        "--config-file",
+        "-c",
+        encoding="utf-8",
+        help="Configurations file",
+    )
+):
     """
     Print parsed config
     """
