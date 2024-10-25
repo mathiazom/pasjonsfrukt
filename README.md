@@ -75,3 +75,12 @@ at `<host>/<podcast_slug>/<episode_id>`
 If a `secret` has been defined in the config, a query parameter (`?secret=<secret-string>`) with matching secret string
 is required to access the served podcast feeds and episode files. This is useful for making RSS feeds accessible on the
 web, without making them fully public. Still, the confidentiality is provided as is, with no warranties 🙃
+
+### Development
+
+#### Formatting
+
+```commandline
+poe fmt
+```
+> uses [Black](https://black.readthedocs.io/en/stable/) code formatter

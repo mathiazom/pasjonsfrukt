@@ -30,6 +30,13 @@ typer = "^0.7.0"
 dataclass-wizard = {extras = ["yaml"], version = "^0.22.2"}
 asyncer = "^0.0.8"
 
+[tool.poetry.group.dev.dependencies]
+black = "^24.10.0"
+poethepoet = "^0.29.0"
+
+[tool.poe.tasks.fmt]
+cmd = "black pasjonsfrukt"
+help = "Format code using black"
 
 [build-system]
 requires = ["poetry-core"]
