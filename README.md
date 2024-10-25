@@ -16,7 +16,7 @@ Scrape PodMe podcast streams to mp3 and host with RSS feed.
 pip install pasjonsfrukt
 ```
 
-2. Install [`ffmpeg`](https://ffmpeg.org/) (required by dependency `youtube-dl` for the `m3u8` format).
+2. Install [`ffmpeg`](https://ffmpeg.org/)
 
 3. Define harvest and feed configurations by copying [`config.template.yaml`](config.template.yaml) to your own `config.yaml`.  
    Most importantly, you need to provide:
