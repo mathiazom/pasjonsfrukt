@@ -6,7 +6,6 @@ from podme_api import PodMeDefaultAuthClient, PodMeUserCredentials, PodMeClient,
 from rfeed import Item, Guid, Enclosure, Feed, Image, iTunesItem, iTunes
 
 from .config import Config
-from .utils import date_of_episode
 
 
 def get_podme_client(email: str, password: str):
@@ -78,11 +77,6 @@ def get_secret_query_parameter(config: Config):
     if config.secret is None:
         return ""  # no secret required, so don't append query parameter
     return f"?secret={config.secret}"
-
-
-def sanitize_xml(content: str) -> str:
-    return content.encode().decode('unicode-escape')
-
 
 def build_podcast_dir(config: Config, slug: str):
     return Path(config.yield_dir) / slug
