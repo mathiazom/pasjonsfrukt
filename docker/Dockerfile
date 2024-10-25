@@ -1,4 +1,4 @@
-FROM python:3.10.9-bullseye
+FROM python:3.11.10-bullseye
 
 RUN apt update && apt -y install cron && apt -y install ffmpeg
 
@@ -10,7 +10,7 @@ RUN touch /var/log/pasjonsfrukt.log
 
 WORKDIR /app
 
-RUN curl -sSL https://install.python-poetry.org | python3 - -y --version 1.3.1
+RUN curl -sSL https://install.python-poetry.org | python3 - -y --version 1.8.3
 
 RUN /root/.local/bin/poetry config virtualenvs.create false
 
