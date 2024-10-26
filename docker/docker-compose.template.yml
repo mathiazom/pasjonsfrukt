@@ -1,7 +1,7 @@
 services:
   pasjonsfrukt:
     container_name: pasjonsfrukt
-    image: ghcr.io/mathiazom/pasjonsfrukt:main
+    image: ghcr.io/mathiazom/pasjonsfrukt:latest
     restart: unless-stopped
     #command: --host 0.0.0.0 --port 8000  # customize flags for 'api' startup command
     ports:
