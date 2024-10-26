@@ -271,13 +271,13 @@ files = [
 
 [[package]]
 name = "dataclass-wizard"
-version = "0.22.3"
+version = "0.23.0"
 description = "Marshal dataclasses to/from JSON. Use field properties with initial values. Construct a dataclass schema with JSON input."
 optional = false
 python-versions = "*"
 files = [
-    {file = "dataclass-wizard-0.22.3.tar.gz", hash = "sha256:4c46591782265058f1148cfd1f54a3a91221e63986fdd04c9d59f4ced61f4424"},
-    {file = "dataclass_wizard-0.22.3-py2.py3-none-any.whl", hash = "sha256:63751203e54b9b9349212cc185331da73c1adc99c51312575eb73bb5c00c1962"},
+    {file = "dataclass-wizard-0.23.0.tar.gz", hash = "sha256:da29ec19846d46a1eef0692ba7c59c8a86ecd3a9eaddc0511cfc7485ad6d9c50"},
+    {file = "dataclass_wizard-0.23.0-py2.py3-none-any.whl", hash = "sha256:50207dec6d36494421366b49b7a9ba6a4d831e2650c0af25cb4c057103d4a97c"},
 ]
 
 [package.dependencies]
@@ -1252,4 +1252,4 @@ propcache = ">=0.2.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "9a26b4b1edddc8808b3dddf452cb841c0148faee07ea4e935e437ef20393b217"
+content-hash = "a95e16d2bb819bcdb604a43f3e962adeb6e9bdc710fc817ced175dd9a8c705dd"
