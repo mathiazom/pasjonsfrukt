@@ -22,17 +22,17 @@ pasjonsfrukt = "pasjonsfrukt.cli:cli"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-fastapi = "^0.88.0"
+fastapi = "0.88.0"
 rfeed = "^1.1.1"
 podme-api = "1.2.9"
-uvicorn = "^0.32.0"
-typer = "^0.7.0"
-dataclass-wizard = {extras = ["yaml"], version = "^0.23.0"}
-asyncer = "^0.0.8"
+uvicorn = "0.32.0"
+typer = "0.7.0"
+dataclass-wizard = {extras = ["yaml"], version = "0.23.0"}
+asyncer = "0.0.8"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.10.0"
-poethepoet = "^0.29.0"
+poethepoet = "0.29.0"
 
 [tool.poe.tasks.fmt]
 cmd = "black pasjonsfrukt"
