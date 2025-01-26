@@ -725,25 +725,33 @@ type = ["mypy (>=1.11.2)"]
 
 [[package]]
 name = "podme-api"
-version = "1.2.9"
+version = "0.0.0"
 description = "A client library for using the podme.com web API"
 optional = false
-python-versions = "<4.0,>=3.11"
-files = [
-    {file = "podme_api-1.2.9-py3-none-any.whl", hash = "sha256:b73adb099059aa5208875c8977bfe925229b8e786fadc9bb37fca5a0ccc9c160"},
-    {file = "podme_api-1.2.9.tar.gz", hash = "sha256:3e1974d0478b59eb23e3abe0bafe9a67e529304f7752a921d7e6ac523b1e0297"},
-]
+python-versions = "^3.11"
+files = []
+develop = false
 
 [package.dependencies]
-aiofiles = ">=24.1.0,<25.0.0"
-aiohttp = ">=3.10.9,<4.0.0"
-isodate = ">=0.7.2,<0.8.0"
-mashumaro = ">=3.13.1,<4.0.0"
-orjson = ">=3.10.7,<4.0.0"
-pathlib = ">=1.0.1,<2.0.0"
-platformdirs = ">=4.3.6,<5.0.0"
-python-ffmpeg = ">=2.0.12,<3.0.0"
-rich = ">=13.9.2,<14.0.0"
+aiofiles = "^24.1.0"
+aiohttp = "^3.10.9"
+isodate = "^0.7.2"
+mashumaro = "^3.13.1"
+orjson = "^3.10.7"
+pathlib = "^1.0.1"
+platformdirs = "^4.3.6"
+python-ffmpeg = "^2.0.12"
+rich = "^13.9.2"
+
+[package.extras]
+doc = []
+test = []
+
+[package.source]
+type = "git"
+url = "https://github.com/mathiazom/podme_api.git"
+reference = "a2a1bb155f45540dbf0bf12eb98e1c07b01b69f1"
+resolved_reference = "a2a1bb155f45540dbf0bf12eb98e1c07b01b69f1"
 
 [[package]]
 name = "poethepoet"
@@ -1259,4 +1267,4 @@ propcache = ">=0.2.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "81de4f26bb9c72194964ea68b08d4b14b4042dbfaa566bd327c01b10471ba53d"
+content-hash = "76ea0840fa8ce386fffac71da044b0094189b6e95783c12a1f937c4bc30c5b59"

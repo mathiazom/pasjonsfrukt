@@ -8,6 +8,7 @@ from podme_api import (
     PodMeClient,
     PodMeEpisode,
 )
+from podme_api.models import PodMeDownloadProgressTask
 from rfeed import Item, Guid, Enclosure, Feed, Image, iTunesItem, iTunes
 
 from .config import Config
@@ -64,7 +65,7 @@ async def harvest_podcast(client: PodMeClient, config: Config, slug: str):
         (url, podcast_dir / f"{episode_id}.mp3") for episode_id, url in download_urls
     ]
 
-    def log_progress(url: str, progress: int, total: int):
+    def log_progress(_: PodMeDownloadProgressTask, url: str, progress: int, total: int):
         print(f"[INFO] Downloading from {url}: {progress}/{total}.")
 
     def log_finished(url: str, path: str):
