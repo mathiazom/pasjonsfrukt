@@ -271,22 +271,25 @@ files = [
 
 [[package]]
 name = "dataclass-wizard"
-version = "0.23.0"
-description = "Marshal dataclasses to/from JSON. Use field properties with initial values. Construct a dataclass schema with JSON input."
+version = "0.35.0"
+description = "Lightning-fast JSON wizardry for Python dataclasses — effortless serialization right out of the box!"
 optional = false
 python-versions = "*"
 files = [
-    {file = "dataclass-wizard-0.23.0.tar.gz", hash = "sha256:da29ec19846d46a1eef0692ba7c59c8a86ecd3a9eaddc0511cfc7485ad6d9c50"},
-    {file = "dataclass_wizard-0.23.0-py2.py3-none-any.whl", hash = "sha256:50207dec6d36494421366b49b7a9ba6a4d831e2650c0af25cb4c057103d4a97c"},
+    {file = "dataclass-wizard-0.35.0.tar.gz", hash = "sha256:8e4b254991bf93416a48e2911bb985e3787cff11f00270c3d1165d2523cb3fb6"},
+    {file = "dataclass_wizard-0.35.0-py2.py3-none-any.whl", hash = "sha256:3bb19292477f0bebb12e9cc9178f1a6b93d133af4ae065abf14b713142b32edf"},
 ]
 
 [package.dependencies]
-PyYAML = {version = ">=5.3", optional = true, markers = "extra == \"yaml\""}
+PyYAML = {version = ">=6,<7", optional = true, markers = "extra == \"yaml\""}
+typing-extensions = {version = ">=4.9.0", markers = "python_version <= \"3.12\""}
 
 [package.extras]
-dev = ["Sphinx (==5.3.0)", "bump2version (==1.0.1)", "coverage (>=6.2)", "dataclass-factory (==2.12)", "dataclasses-json (==0.5.6)", "flake8 (>=3)", "jsons (==1.6.1)", "pip (>=21.3.1)", "pytest (==7.0.1)", "pytest-cov (==3.0.0)", "pytest-mock (>=3.6.1)", "pytimeparse (==1.1.8)", "sphinx-issues (==3.0.1)", "sphinx-issues (==4.0.0)", "tox (==3.24.5)", "twine (==3.8.0)", "watchdog[watchmedo] (==2.1.6)", "wheel (==0.37.1)", "wheel (==0.42.0)"]
+dev = ["Sphinx (==7.4.7)", "Sphinx (==8.1.3)", "attrs (==24.3.0)", "bump2version (==1.0.1)", "coverage (>=6.2)", "dacite (==1.8.1)", "dataclass-factory (==2.16)", "dataclass-wizard[toml]", "dataclasses-json (==0.6.7)", "flake8 (>=3)", "jsons (==1.6.3)", "mashumaro (==3.15)", "matplotlib", "pip (>=21.3.1)", "pydantic (==2.10.3)", "pytest (==8.3.4)", "pytest-benchmark[histogram]", "pytest-cov (==6.0.0)", "pytest-mock (>=3.6.1)", "python-dotenv (>=1,<2)", "pytimeparse (==1.1.8)", "sphinx-autodoc-typehints (==2.5.0)", "sphinx-copybutton (==0.5.2)", "sphinx-issues (==5.0.0)", "tomli (>=2,<3)", "tomli (>=2,<3)", "tomli-w (>=1,<2)", "tox (==4.23.2)", "twine (==6.0.1)", "typing-extensions (>=4.9.0)", "watchdog[watchmedo] (==6.0.0)", "wheel (==0.45.1)"]
+dotenv = ["python-dotenv (>=1,<2)"]
 timedelta = ["pytimeparse (>=1.1.7)"]
-yaml = ["PyYAML (>=5.3)"]
+toml = ["tomli (>=2,<3)", "tomli (>=2,<3)", "tomli-w (>=1,<2)"]
+yaml = ["PyYAML (>=6,<7)"]
 
 [[package]]
 name = "fastapi"
@@ -1259,4 +1262,4 @@ propcache = ">=0.2.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "94d156fd7a5bdc7d775b57965942979c8abc2f21b52639742e3006649568f38e"
+content-hash = "f48ef207c1579ba56ec7df081a84d081ebbd2903d24849a1f1f7ec9cccfa22d2"
