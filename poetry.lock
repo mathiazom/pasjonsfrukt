@@ -708,6 +708,17 @@ files = [
 ]
 
 [[package]]
+name = "pkce"
+version = "1.0.3"
+description = "PKCE Pyhton generator."
+optional = false
+python-versions = ">=3"
+files = [
+    {file = "pkce-1.0.3-py3-none-any.whl", hash = "sha256:55927e24c7d403b2491ebe182b95d9dcb1807643243d47e3879fbda5aad4471d"},
+    {file = "pkce-1.0.3.tar.gz", hash = "sha256:9775fd76d8a743d39b87df38af1cd04a58c9b5a5242d5a6350ef343d06814ab6"},
+]
+
+[[package]]
 name = "platformdirs"
 version = "4.3.6"
 description = "A small Python package for determining appropriate platform-specific dirs, e.g. a `user data dir`."
@@ -739,6 +750,7 @@ isodate = "^0.7.2"
 mashumaro = "^3.13.1"
 orjson = "^3.10.7"
 pathlib = "^1.0.1"
+pkce = "^1.0.3"
 platformdirs = "^4.3.6"
 python-ffmpeg = "^2.0.12"
 rich = "^13.9.2"
@@ -750,8 +762,8 @@ test = []
 [package.source]
 type = "git"
 url = "https://github.com/mathiazom/podme_api.git"
-reference = "c0c0a625ea8fe306183fecb37256132f121bbca2"
-resolved_reference = "c0c0a625ea8fe306183fecb37256132f121bbca2"
+reference = "9be1f86fc199d4e0841d24a2cf200ba729b0147b"
+resolved_reference = "9be1f86fc199d4e0841d24a2cf200ba729b0147b"
 
 [[package]]
 name = "poethepoet"
@@ -1267,4 +1279,4 @@ propcache = ">=0.2.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "7d6f75ac579e4bec9d3ef892991e0674609e756d1fcdbd9e6668c743a002b11a"
+content-hash = "02c5a7f8c4c6c43d1f9f84d5e68444a82bff9eb3e733c5a562793cfbf52e373c"

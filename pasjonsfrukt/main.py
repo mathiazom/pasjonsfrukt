@@ -8,6 +8,7 @@ from podme_api import (
     PodMeClient,
     PodMeEpisode,
 )
+from podme_api.auth.mobile_client import PodMeMobileAuthClient
 from podme_api.models import PodMeDownloadProgressTask
 from rfeed import Item, Guid, Enclosure, Feed, Image, iTunesItem, iTunes
 
@@ -16,9 +17,13 @@ from .config import Config
 
 @contextlib.asynccontextmanager
 async def get_podme_client(email: str, password: str):
+    user_credentials = PodMeUserCredentials(email=email, password=password)
     client = PodMeClient(
         auth_client=PodMeDefaultAuthClient(
-            user_credentials=PodMeUserCredentials(email=email, password=password)
+            user_credentials=user_credentials
+        ),
+        mobile_auth_client=PodMeMobileAuthClient(
+            user_credentials=user_credentials
         ),
         request_timeout=30,
     )
