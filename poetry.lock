@@ -762,8 +762,8 @@ test = []
 [package.source]
 type = "git"
 url = "https://github.com/mathiazom/podme_api.git"
-reference = "9be1f86fc199d4e0841d24a2cf200ba729b0147b"
-resolved_reference = "9be1f86fc199d4e0841d24a2cf200ba729b0147b"
+reference = "3b15922d047cea4ae821074de45360364d96fb2e"
+resolved_reference = "3b15922d047cea4ae821074de45360364d96fb2e"
 
 [[package]]
 name = "poethepoet"
@@ -1279,4 +1279,4 @@ propcache = ">=0.2.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "02c5a7f8c4c6c43d1f9f84d5e68444a82bff9eb3e733c5a562793cfbf52e373c"
+content-hash = "2f929da34d7be0fed5debb6d1be7d20d0ad9b28ac25340d6c9e0a8c83e9b84e0"
