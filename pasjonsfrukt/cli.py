@@ -36,7 +36,9 @@ async def harvest(
     Scrape podcast episodes
     """
     config = config_from_stream(config_stream)
-    async with get_podme_client(config.auth.email, config.auth.password) as client:
+    async with get_podme_client(
+        config.auth.email, config.auth.password, config.api
+    ) as client:
         to_harvest = config.podcasts.keys() if podcast_slugs is None else podcast_slugs
         for s in to_harvest:
             await harvest_podcast(client, config, s)
@@ -64,7 +66,9 @@ async def sync_feeds(
     Update RSS podcast feeds to match scraped episodes
     """
     config = config_from_stream(config_stream)
-    async with get_podme_client(config.auth.email, config.auth.password) as client:
+    async with get_podme_client(
+        config.auth.email, config.auth.password, config.api
+    ) as client:
         to_sync = config.podcasts.keys() if podcast_slugs is None else podcast_slugs
         for s in to_sync:
             await sync_slug_feed(client, config, s)

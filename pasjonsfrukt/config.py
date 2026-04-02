@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from io import TextIOWrapper
 from typing import Optional
 
@@ -18,6 +18,14 @@ class Podcast:
 
 
 @dataclass
+class ApiConfig:
+    language: Optional[str] = None  # "NO", "SE", "FI"
+    region: Optional[str] = None  # "NO", "SE", "FI"
+    request_timeout: float = 30.0
+    disable_credentials_storage: bool = False
+
+
+@dataclass
 class Config(YAMLWizard):
     host: str
     auth: Auth
@@ -26,6 +34,7 @@ class Config(YAMLWizard):
     ]  # Podcast is not actually optional, see __post_init__
     yield_dir: str = "yield"
     secret: Optional[str] = None
+    api: ApiConfig = field(default_factory=ApiConfig)
 
     def __post_init__(self):
         # All Podcast properties are currently optional, but default values need to be initialized

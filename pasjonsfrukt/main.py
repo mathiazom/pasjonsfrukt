@@ -9,18 +9,29 @@ from podme_api import (
     PodMeEpisode,
 )
 from podme_api.models import PodMeDownloadProgressTask
+from podme_api.const import PodMeRegion
+from podme_api.models import PodMeLanguage
 from rfeed import Item, Guid, Enclosure, Feed, Image, iTunesItem, iTunes
 
-from .config import Config
+from .config import ApiConfig, Config
 
 
 @contextlib.asynccontextmanager
-async def get_podme_client(email: str, password: str):
+async def get_podme_client(email: str, password: str, api_config: ApiConfig = None):
+    api_config = api_config or ApiConfig()
+    kwargs = dict(
+        request_timeout=api_config.request_timeout,
+        disable_credentials_storage=api_config.disable_credentials_storage,
+    )
+    if api_config.language is not None:
+        kwargs["language"] = PodMeLanguage[api_config.language.upper()]
+    if api_config.region is not None:
+        kwargs["region"] = PodMeRegion[api_config.region.upper()]
     client = PodMeClient(
         auth_client=PodMeDefaultAuthClient(
             user_credentials=PodMeUserCredentials(email=email, password=password)
         ),
-        request_timeout=30,
+        **kwargs,
     )
     try:
         await client.__aenter__()

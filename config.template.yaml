@@ -2,6 +2,11 @@
 host: "https://<your-domain-here>"
 yield_dir: "yield"
 #secret: "<optional-access-secret>"
+#api:
+#  language: NO        # NO, SE, FI (default: NO)
+#  region: NO          # NO, SE, FI (default: NO)
+#  request_timeout: 30.0
+#  disable_credentials_storage: false
 auth:
   email: "<your-email-here>"
   password: "<your-password-here>"
