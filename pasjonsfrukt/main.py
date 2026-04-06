@@ -20,15 +20,15 @@ from .config import ApiConfig, Config
 async def get_podme_client(email: str, password: str, api_config: ApiConfig = None):
     api_config = api_config or ApiConfig()
     auth_client = PodMeDefaultAuthClient(
-            user_credentials=PodMeUserCredentials(email=email, password=password),
-        )
-    if api_config.region is not None:
-        auth_client.region = PodMeRegion[api_config.region.upper()]
+        user_credentials=PodMeUserCredentials(email=email, password=password),
+    )
     client = PodMeClient(
         auth_client=auth_client,
         request_timeout=api_config.request_timeout,
         disable_credentials_storage=api_config.disable_credentials_storage,
     )
+    if api_config.region is not None:
+        auth_client.region = PodMeRegion[api_config.region.upper()]
     client.region = auth_client.region
     if api_config.language is not None:
         client.language = PodMeLanguage[api_config.language.upper()]
