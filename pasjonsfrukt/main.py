@@ -65,7 +65,14 @@ async def fetch_bytes(client: PodMeClient, url: str) -> bytes:
 async def decrypt_segment(data: bytes, key: bytes, iv: bytes) -> bytes:
     """Decrypt one AES-128-CBC encrypted HLS segment (PKCS7 padding)."""
     proc = await asyncio.create_subprocess_exec(
-        "openssl", "enc", "-d", "-aes-128-cbc", "-K", key.hex(), "-iv", iv.hex(),
+        "openssl",
+        "enc",
+        "-d",
+        "-aes-128-cbc",
+        "-K",
+        key.hex(),
+        "-iv",
+        iv.hex(),
         stdin=asyncio.subprocess.PIPE,
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.DEVNULL,
@@ -126,7 +133,7 @@ async def harvest_hls_episode(
             init_uri = line.split('URI="')[1].split('"')[0]
         elif line.startswith("#EXT-X-KEY:"):
             key_uri = line.split('URI="')[1].split('"')[0]
-            iv_match = re.search(r'IV=0[xX]([0-9a-fA-F]+)', line)
+            iv_match = re.search(r"IV=0[xX]([0-9a-fA-F]+)", line)
             if iv_match:
                 key_iv = bytes.fromhex(iv_match.group(1).zfill(32))
         elif line.startswith("#EXT-X-MEDIA-SEQUENCE:"):
@@ -149,25 +156,42 @@ async def harvest_hls_episode(
     async def fetch_segment(index: int, uri: str) -> bytes:
         async with semaphore:
             data = await fetch_bytes(client, resolve_uri(audio_playlist_url, uri))
-            iv = key_iv if key_iv is not None else (media_sequence + index).to_bytes(16, "big")
+            iv = (
+                key_iv
+                if key_iv is not None
+                else (media_sequence + index).to_bytes(16, "big")
+            )
             return await decrypt_segment(data, key, iv)
 
     tasks = [fetch_segment(i, uri) for i, uri in enumerate(segments)]
-    print(f"[INFO] Downloading HLS audio for episode {episode_id}: {len(segments)} segments")
+    print(
+        f"[INFO] Downloading HLS audio for episode {episode_id}: {len(segments)} segments"
+    )
     # gather() preserves the order of `tasks`, unlike as_completed() — the
     # order of media segments in the output file must be strictly sequential
     results = await asyncio.gather(*tasks)
     raw += b"".join(results)
-    print(f"[INFO] HLS download of episode {episode_id} complete: {len(segments)} segments")
+    print(
+        f"[INFO] HLS download of episode {episode_id} complete: {len(segments)} segments"
+    )
 
     # concat to a temporary fragmented-mp4, then transcode to mp3
     tmp_fmp4 = target_path.with_suffix(".fmp4")
     tmp_fmp4.write_bytes(raw)
     try:
         proc = await asyncio.create_subprocess_exec(
-            "ffmpeg", "-y", "-loglevel", "error",
-            "-i", str(tmp_fmp4),
-            "-vn", "-c:a", "libmp3lame", "-q:a", "2", str(target_path),
+            "ffmpeg",
+            "-y",
+            "-loglevel",
+            "error",
+            "-i",
+            str(tmp_fmp4),
+            "-vn",
+            "-c:a",
+            "libmp3lame",
+            "-q:a",
+            "2",
+            str(target_path),
             stdout=asyncio.subprocess.DEVNULL,
             stderr=asyncio.subprocess.PIPE,
         )
