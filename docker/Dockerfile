@@ -1,4 +1,4 @@
-FROM python:3.11.10-bullseye
+FROM python:3.11.10-bookworm
 
 RUN apt update && apt -y install cron && apt -y install ffmpeg
 
