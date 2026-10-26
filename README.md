@@ -1,33 +1,45 @@
 # 🍹 pasjonsfrukt
 
-[![PyPI](https://img.shields.io/pypi/v/pasjonsfrukt)](https://pypi.org/project/pasjonsfrukt/)
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pasjonsfrukt)
-[![PyPI - License](https://img.shields.io/pypi/l/pasjonsfrukt)](https://github.com/mathiazom/pasjonsfrukt/blob/main/LICENSE)
+[![pasjonsfrukt](https://img.shields.io/badge/ghcr.io-mathiazom%2Fpasjonsfrukt-blue?logo=docker)](https://github.com/users/mathiazom/packages/container/package/pasjonsfrukt)
 
 Scrape PodMe podcast streams to mp3 and host with RSS feed.
 
 <i style="color:grey">Note: A valid PodMe subscription is required to access premium content</i>
 
-### Setup
+## Setup
 
-1. Install `pasjonsfrukt`
+### CLI
+
+1. Clone repo
+2. Install [`poetry`](https://python-poetry.org/)
+3. Install dependencies
 
 ```
-pip install pasjonsfrukt
+poetry install
 ```
 
-2. Install [`ffmpeg`](https://ffmpeg.org/)
+4. Install [`ffmpeg`](https://ffmpeg.org/)
 
-3. Define harvest and feed configurations by copying [`config.template.yaml`](config.template.yaml) to your own `config.yaml`.  
+5. Define harvest and feed configurations by copying [`config.template.yaml`](config.template.yaml) to your own `config.yaml`.  
    Most importantly, you need to provide:
 
    - a `host` path (for links in the RSS feeds)
    - login credentials (`auth`) for your PodMe account
    - the `podcasts` you wish to harvest and serve
 
-### Usage
+### Docker
 
-##### Harvest episodes
+Latest image is published at `ghcr.io/mathiazom/pasjonsfrukt:main`.
+
+**Docker Compose**: use the [`docker-compose.template.yml`](./docker/docker-compose.template.yml) as a starting point.
+
+Remember to map the config file and yield directory. An optional crontab can be mounted for periodic harvesting.
+
+The Docker image serves the podcast feeds via `pasjonsfrukt serve`.
+
+## Usage
+
+### Harvest episodes
 
 Harvest episodes of all podcasts defined in config
 
@@ -41,7 +53,7 @@ Harvest episodes of specific podcast(s)
 pasjonsfrukt harvest [PODCAST_SLUG]...
 ```
 
-##### Update feeds
+### Update feeds
 
 Update all RSS feeds defined in config
 
@@ -57,7 +69,7 @@ pasjonsfrukt sync [PODCAST_SLUG]...
 
 > The feeds are always updated after harvest, so manual feed syncing is only required if files are changed externally
 
-##### Serve RSS feeds with episodes
+### Serve RSS feeds with episodes
 
 Run web server
 
@@ -70,15 +82,15 @@ at `<host>/<podcast_slug>/<episode_id>`
 
 > `host` must be defined in the config file.
 
-##### Secret
+### Secret
 
 If a `secret` has been defined in the config, a query parameter (`?secret=<secret-string>`) with matching secret string
 is required to access the served podcast feeds and episode files. This is useful for making RSS feeds accessible on the
 web, without making them fully public. Still, the confidentiality is provided as is, with no warranties 🙃
 
-### Development
+## Development
 
-#### Formatting
+### Formatting
 
 ```commandline
 poe fmt

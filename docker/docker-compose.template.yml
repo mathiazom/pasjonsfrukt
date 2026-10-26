@@ -11,5 +11,5 @@ services:
       - ./yield:/app/yield
       # config
       - ./config.yaml:/app/config.yaml:ro
-      # crontab
-      - ./crontab:/etc/cron.d/pasjonsfrukt-crontab:ro
+      # crontab (optional)
+      #- ./crontab:/etc/cron.d/pasjonsfrukt-crontab:ro
