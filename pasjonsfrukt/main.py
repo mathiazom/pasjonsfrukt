@@ -273,21 +273,23 @@ async def harvest_podcast(client: PodMeClient, config: Config, slug: str):
     await sync_slug_feed(client, config, slug)
 
 
-async def harvested_episode_ids(client: PodMeClient, config: Config, slug: str):
+async def harvested_episode_ids(
+    client: PodMeClient, config: Config, slug: str
+) -> list[int]:
     podcast_dir = build_podcast_dir(config, slug)
     if not podcast_dir.is_dir():
         # no directory, so clearly no harvested episodes
         return []
-    episode_ids = await client.get_episode_ids(slug)
+    episode_ids = set(await client.get_episode_ids(slug))
     harvested = []
     for f in podcast_dir.iterdir():
-        if not f.is_file():
+        if not f.is_file() or f.suffix.lower() != ".mp3":
             continue
-        m = re.match(r"(.*)\.mp3$", f.name)
-        if m is not None:
-            episode_id = int(m.group(1))
-            if episode_id in episode_ids:
-                harvested.append(episode_id)
+        if not (f.stem.isascii() and f.stem.isdigit()):
+            continue
+        episode_id = int(f.stem)
+        if episode_id in episode_ids:
+            harvested.append(episode_id)
     return harvested
 
 
