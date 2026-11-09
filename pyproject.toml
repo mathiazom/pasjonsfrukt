@@ -27,7 +27,7 @@ rfeed = "^1.1.1"
 podme-api = {git = "https://github.com/bendikrb/podme_api", rev = "90ea081a9eaa288c8a54afbb5a76c416b3de6285"}
 uvicorn = "0.34.0"
 typer = "0.15.1"
-dataclass-wizard = {extras = ["yaml"], version = "1.0.0"}
+dataclass-wizard = {extras = ["yaml"], version = "0.35.0"}
 asyncer = "0.0.8"
 
 [tool.poetry.group.dev.dependencies]
