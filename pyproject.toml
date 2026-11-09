@@ -6,13 +6,6 @@ authors = ["Mathias Oterhals Myklebust <mathias@oterbust.no>"]
 readme = "README.md"
 homepage = "https://github.com/mathiazom/pasjonsfrukt"
 repository = "https://github.com/mathiazom/pasjonsfrukt"
-classifiers = [
-    "Development Status :: 4 - Beta",
-    "Intended Audience :: Developers",
-    "Programming Language :: Python :: 3.10",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
-]
 
 [tool.poetry.urls]
 "Bug Tracker" = "https://github.com/mathiazom/pasjonsfrukt/issues"
