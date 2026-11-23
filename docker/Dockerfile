@@ -1,4 +1,4 @@
-FROM python:3.15.0-bookworm
+FROM python:3.15.2-bookworm
 
 RUN apt update && apt -y install cron && apt -y install ffmpeg
 
